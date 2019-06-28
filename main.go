@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"github.com/Sharykhin/go-payments/database"
+	"github.com/Sharykhin/go-payments/entity"
 	"github.com/gin-gonic/gin"
 	"log"
 	"os"
@@ -11,10 +12,10 @@ func main() {
 	r := gin.Default()
 
 	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
+		var user entity.User
+		database.Conn.First(&user, 1)
+		c.JSON(200,user)
 	})
-	fmt.Println("SERVER_ADDR", os.Getenv("SERVER_ADDR"))
+
 	log.Fatal(r.Run(os.Getenv("SERVER_ADDR")))
 }
