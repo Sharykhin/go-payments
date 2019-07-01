@@ -12,7 +12,10 @@ require (
 	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
 	github.com/jinzhu/gorm v1.9.9
 	github.com/mattn/go-isatty v0.0.8 // indirect
+	github.com/pkg/errors v0.8.1 // indirect
+	github.com/pressly/goose v2.6.0+incompatible // indirect
 	github.com/stretchr/objx v0.2.0 // indirect
+	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.opencensus.io v0.22.0 // indirect
 	golang.org/x/crypto v0.0.0-20190621222207-cc06ce4a13d4 // indirect
 	golang.org/x/exp v0.0.0-20190627132806-fd42eb6b336f // indirect

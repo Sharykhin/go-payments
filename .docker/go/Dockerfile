@@ -6,4 +6,6 @@ COPY . .
 
 RUN go get -v ./...
 
+RUN go get -u github.com/pressly/goose/cmd/goose
+
 

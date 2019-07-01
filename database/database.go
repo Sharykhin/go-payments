@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	"github.com/Sharykhin/go-payments/entity"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"log"
@@ -28,7 +27,6 @@ func init() {
 	if err := db.DB().Ping(); err != nil {
 		log.Panicf("failed to ping a database: %v", err)
 	}
-	db.AutoMigrate(&entity.User{})
 
 	Conn = db
 
