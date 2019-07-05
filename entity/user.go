@@ -3,11 +3,12 @@ package entity
 import "time"
 
 type (
+	//User is a central entity, a person who makes all the payments
 	User struct {
-		ID        int64      `gorm:"primary_key;AUTO_INCREMENT"`
-		FirstName string     `gorm:"type:varchar(80);not null"`
-		LastName  NullString `gorm:"type:varchar(80)"`
-		Email     string     `gorm:"type:varchar(80);not null;unique_index"`
+		ID        int64
+		FirstName string
+		LastName  NullString
+		Email     string
 		CreatedAt time.Time
 	}
 )
