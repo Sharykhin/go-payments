@@ -1,8 +1,9 @@
 package entity
 
 import (
-	"github.com/shopspring/decimal"
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 type (
@@ -20,5 +21,6 @@ type (
 		User          User
 		Date          time.Time
 		Amount        decimal.Decimal
+		Description   NullString
 	}
 )
