@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/Sharykhin/go-payments/http"
 	"log"
+
+	http "github.com/Sharykhin/go-payments/http/web"
 )
 
 func main() {

@@ -1,11 +1,10 @@
-package http
+package api
 
 import (
 	"os"
 
 	"github.com/Sharykhin/go-payments/http/handler"
 	handlerPayment "github.com/Sharykhin/go-payments/http/handler/payment"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,5 +15,5 @@ func ListenAndServe() error {
 	r.GET("/ping", handler.Ping)
 	r.POST("/payments", handlerPayment.CreateTransaction)
 
-	return r.Run(os.Getenv("SERVER_ADDR"))
+	return r.Run(os.Getenv("API_ADDR"))
 }
