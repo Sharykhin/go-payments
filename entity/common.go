@@ -3,10 +3,12 @@ package entity
 import (
 	"bytes"
 	"database/sql"
+	"time"
 )
 
 type (
 	NullString sql.NullString
+	NullTime   time.Time
 )
 
 func (s NullString) MarshalJSON() ([]byte, error) {

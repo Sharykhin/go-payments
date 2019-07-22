@@ -7,7 +7,7 @@ import (
 )
 
 func HomePage(c *gin.Context) {
-	c.HTML(http.StatusOK, "posts/index.tmpl", gin.H{
+	c.HTML(http.StatusOK, "index.tmpl", gin.H{
 		"title": "Posts",
 	})
 }

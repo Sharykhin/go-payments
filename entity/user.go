@@ -14,6 +14,7 @@ type (
 		LastName  NullString
 		Email     string
 		CreatedAt time.Time
+		DeletedAt time.Time
 	}
 
 	Payment struct {
