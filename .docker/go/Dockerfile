@@ -1,11 +1,20 @@
-FROM golang:1.12
+FROM golang:1.12 as build-env
 
-WORKDIR /app
+ADD . /src
 
-COPY . .
+WORKDIR /src
 
 RUN go get -v ./...
 
-RUN go get -u github.com/pressly/goose/cmd/goose
+RUN cd cmd/api && go build -o api
+
+FROM alpine
+
+WORKDIR /app
+
+COPY --from=build-env /src/cmd/api/api /app/
+
+ENTRYPOINT ./api
+
 
 

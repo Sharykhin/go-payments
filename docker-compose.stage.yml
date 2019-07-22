@@ -4,14 +4,14 @@ services:
   payments-api:
     image: payments-api
     container_name: payments-api
-    command: bash -c "go build -o server . && /app/server"
+#    command: bash -c "go build -o server . && /app/server"
     build:
       context: .
       dockerfile: .docker/go/Dockerfile
     env_file:
       - .docker/go/.env
-    volumes:
-      - .:/app
+#    volumes:
+#      - .:/app
     links:
       - payments-postgres
     ports:
