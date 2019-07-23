@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	cloud.google.com/go v0.40.0 // indirect
+	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/autotls v0.0.0-20190528142357-3135c7b8d15d
 	github.com/gin-gonic/gin v1.4.0
@@ -31,4 +32,5 @@ require (
 	google.golang.org/appengine v1.6.1 // indirect
 	google.golang.org/genproto v0.0.0-20190627203621-eb59cef1c072 // indirect
 	google.golang.org/grpc v1.21.1 // indirect
+	gopkg.in/go-playground/validator.v8 v8.18.2
 )

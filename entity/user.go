@@ -13,8 +13,9 @@ type (
 		FirstName string
 		LastName  NullString
 		Email     string
+		Password  string
 		CreatedAt time.Time
-		DeletedAt time.Time
+		DeletedAt NullTime
 	}
 
 	Payment struct {
