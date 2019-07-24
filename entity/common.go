@@ -9,8 +9,10 @@ import (
 )
 
 type (
+	// NullString represents string values that can be null
 	NullString sql.NullString
-	NullTime   struct {
+	// NullTime represents datetime that can be null
+	NullTime struct {
 		Valid bool
 		Time  time.Time
 	}
@@ -30,6 +32,7 @@ func (nt NullTime) Value() (driver.Value, error) {
 	return nt.Time, nil
 }
 
+// MarshalJSON implements json.Marshaler interface
 func (nt NullTime) MarshalJSON() ([]byte, error) {
 	if nt.Valid {
 		return []byte(nt.Time.Format("2006-01-02T15:04:05Z")), nil
@@ -52,6 +55,7 @@ func (nt *NullTime) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// Scan implements the Scanner interface.
 func (ns *NullString) Scan(value interface{}) error {
 	var s sql.NullString
 	if err := s.Scan(value); err != nil {
@@ -68,32 +72,35 @@ func (ns *NullString) Scan(value interface{}) error {
 	return nil
 }
 
+// Value implements the driver Valuer interface.
 func (ns NullString) Value() (driver.Value, error) {
-	if ns.Valid {
-		return ns.String, nil
+	if !ns.Valid {
+		return nil, nil
 	}
 
-	return nil, nil
+	return ns.String, nil
 }
 
-func (s NullString) MarshalJSON() ([]byte, error) {
+// MarshalJSON implements json.Marshaler interface
+func (ns NullString) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
-	if s.Valid == false {
+	if ns.Valid == false {
 		buf.WriteString(`null`)
 		return []byte("null"), nil
 	} else {
-		buf.WriteString(`"` + s.String + `"`)
+		buf.WriteString(`"` + ns.String + `"`)
 	}
 
 	return buf.Bytes(), nil
 }
 
-func (s *NullString) UnmarshalJSON(in []byte) error {
+// UnmarshalJSON implements the json.Unmarshaler interface.
+// Return null if string is considered as nullable
+func (ns *NullString) UnmarshalJSON(in []byte) error {
 	str := string(in)
-	if str == `null` {
+	if str == `null` || str == `""` {
 		return nil
 	}
-
-	s.Valid, s.String = true, str
+	ns.Valid, ns.String = true, str
 	return nil
 }

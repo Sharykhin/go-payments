@@ -19,16 +19,8 @@
             <a class="nav-link active" href="/sign-in">Sign In</a>
         </li>
     </ul>
-    <h3>Sign Up</h3>
-    <form method="post" id="sign-up-form" action="http://localhost:8000/v1/register">
-        <div class="form-group">
-            <label>First Name</label>
-            <input type="text" name="first_name" class="form-control" placeholder="John" />
-        </div>
-        <div class="form-group">
-            <label>Last Name</label>
-            <input type="text" name="last_name" class="form-control" placeholder="McClain" />
-        </div>
+    <h3>Sign In</h3>
+    <form method="post" id="sign-in-form" action="http://localhost:8000/v1/login">
         <div class="form-group">
             <label>Email</label>
             <input type="email" name="email" class="form-control" placeholder="john_mcclan@test.com" />
@@ -43,7 +35,7 @@
 <script>
     var API = {{ .API_ADDRESS }}
     $(document).ready(function () {
-        $('#sign-up-form').on('submit', function (event) {
+        $('#sign-in-form').on('submit', function (event) {
             event.preventDefault();
             var data = {};
             $.map(($(this).serializeArray()), function (n, i) {
@@ -53,7 +45,7 @@
             $.ajax({
                 type: "POST",
                 //the url where you want to sent the userName and password to
-                url: API + '/v1/register',
+                url: API + '/v1/login',
                 contentType:"application/json; charset=utf-8",
                 dataType: 'json',
                 //json object to sent to the authentication url

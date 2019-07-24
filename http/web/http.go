@@ -12,10 +12,15 @@ import (
 func ListenAndServe() error {
 	r := gin.New()
 
-	html := template.Must(template.ParseFiles("templates/web/index.tmpl", "templates/web/sign_up.tmpl"))
+	html := template.Must(template.ParseFiles(
+		"templates/web/index.tmpl",
+		"templates/web/sign_up.tmpl",
+		"templates/web/sign_in.tmpl",
+	))
 	r.SetHTMLTemplate(html)
 	r.GET("/", handler.HomePage)
 	r.GET("/sign-up", handler.SignUp)
+	r.GET("/sign-in", handler.SignIn)
 
 	return r.Run(os.Getenv("WEB_ADDR"))
 }

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"gopkg.in/go-playground/validator.v8"
+
 	"github.com/Sharykhin/go-payments/database"
 	"github.com/Sharykhin/go-payments/entity"
 	"golang.org/x/crypto/bcrypt"
@@ -15,6 +17,8 @@ import (
 
 func Register(c *gin.Context) {
 	var rr request.RegisterRequest
+
+	// TODO: heck
 	if err := c.ShouldBindJSON(&rr); err != nil {
 		validationErrors := err.(validator.ValidationErrors)
 		errors := make(map[string]string, len(validationErrors))
@@ -25,18 +29,18 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(rr.Password), bcrypt.MinCost)
+	// TODO: heck
+	hash, err := bcrypt.GenerateFromPassword([]byte(rr.Password), bcrypt.DefaultCost)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong"})
 	}
+
+	//TODO: heck
 	user := entity.User{
 		FirstName: rr.FirstName,
-		LastName: entity.NullString{
-			Valid:  true,
-			String: rr.LastName,
-		},
-		Email:    rr.Email,
-		Password: string(hash),
+		LastName:  rr.LastName,
+		Email:     rr.Email,
+		Password:  string(hash),
 		DeletedAt: entity.NullTime{
 			Valid: false,
 		},
