@@ -16,11 +16,13 @@ func ListenAndServe() error {
 		"templates/web/index.tmpl",
 		"templates/web/sign_up.tmpl",
 		"templates/web/sign_in.tmpl",
+		"templates/web/create_payment.tmpl",
 	))
 	r.SetHTMLTemplate(html)
 	r.GET("/", handler.HomePage)
 	r.GET("/sign-up", handler.SignUp)
 	r.GET("/sign-in", handler.SignIn)
+	r.GET("/payments/create", handler.CreatePayment)
 
 	return r.Run(os.Getenv("WEB_ADDR"))
 }

@@ -1,0 +1,73 @@
+<!doctype>
+<html>
+<head>
+    <title>Go Payments</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
+</head>
+<body>
+<div class="container">
+    <h2>Payments</h2>
+    <ul class="nav">
+        <li class="nav-item">
+            <a class="nav-link" href="/">Home Page</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="/sign-up">Sign Up</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="/sign-in">Sign In</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="/payments/create">Add Payment</a>
+        </li>
+    </ul>
+    <h3>Add Payment</h3>
+    <form method="post" id="add-payment-form">
+        <div class="form-group">
+            <label>User ID</label>
+            <input type="number" name="user_id" class="form-control" placeholder="1" />
+        </div>
+        <div class="form-group">
+            <label>Amount</label>
+            <input type="number" name="amount" class="form-control" placeholder="50.25" />
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <input type="text" name="description" class="form-control" placeholder="Some desc" />
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+<script>
+    var API = {{ .API_ADDRESS }}
+        $(document).ready(function () {
+            $('#add-payment-form').on('submit', function (event) {
+                event.preventDefault();
+                var data = {};
+                $.map(($(this).serializeArray()), function (n, i) {
+                    data[n['name']] = n['value'];
+                });
+
+                $.ajax({
+                    type: "POST",
+                    //the url where you want to sent the userName and password to
+                    url: API + '/v1/payments',
+                    contentType:"application/json; charset=utf-8",
+                    dataType: 'json',
+                    //json object to sent to the authentication url
+                    data: JSON.stringify(data),
+                    success: function (response) {
+
+                        console.log('sucess', response);
+                    },
+                    error: function (response) {
+                        console.log('error', response);
+                    }
+                });
+                console.log(data);
+            });
+        });
+</script>
+</body>
+</html>

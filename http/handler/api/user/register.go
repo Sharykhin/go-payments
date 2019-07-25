@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gin-contrib/sessions"
+
 	"gopkg.in/go-playground/validator.v8"
 
 	"github.com/Sharykhin/go-payments/database"
@@ -47,6 +49,8 @@ func Register(c *gin.Context) {
 	}
 	fmt.Println("user", user)
 	database.G.Save(&user)
+	session := sessions.Default(c)
+	session.Set("user_id", user.ID)
 
 	c.JSON(http.StatusCreated, gin.H{"user": user})
 }

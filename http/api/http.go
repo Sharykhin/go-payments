@@ -25,9 +25,12 @@ func ListenAndServe() error {
 	v1 := r.Group("/v1")
 	{
 		v1.GET("/ping", handler.Ping)
-		v1.POST("/payments", handlerPayment.CreateTransaction)
 		v1.POST("/register", handlerUser.Register)
 		v1.POST("/login", handlerAuth.Login)
+
+		auth := v1.Group("/")
+		//auth.Use(middleware.Auth())
+		auth.POST("/payments", handlerPayment.CreateTransaction)
 	}
 
 	return r.Run(os.Getenv("API_ADDR"))

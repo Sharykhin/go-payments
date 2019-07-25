@@ -17,3 +17,6 @@ migration:
 
 migrate:
 	goose -dir migrations postgres "host=localhost user=root password=root dbname=payments sslmode=disable port=54320" up
+
+migrate-down:
+	goose -dir migrations postgres "host=localhost user=root password=root dbname=payments sslmode=disable port=54320" down

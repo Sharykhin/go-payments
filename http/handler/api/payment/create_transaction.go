@@ -2,7 +2,11 @@ package payment
 
 import (
 	"fmt"
-	"log"
+	"net/http"
+	"time"
+
+	"github.com/Sharykhin/go-payments/database"
+	"github.com/Sharykhin/go-payments/entity"
 
 	"github.com/Sharykhin/go-payments/request/payment"
 	"github.com/gin-gonic/gin"
@@ -10,10 +14,25 @@ import (
 
 func CreateTransaction(c *gin.Context) {
 	var r payment.CreateTransactionRequest
-	err := c.ShouldBind(&r)
-	if err != nil {
-		log.Fatal(err)
+	if err := c.ShouldBind(&r); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	fmt.Println(r)
-	c.JSON(200, nil)
+	u := entity.User{ID: r.UserID}
+	database.G.Find(&u)
+	fmt.Println(u)
+	p := entity.Payment{
+		TransactionID: "123451223",
+		User:          u,
+		Status:        "Accepted",
+		Description:   r.Description,
+		Amount:        r.Amount,
+		ChargeDate:    time.Now().UTC(),
+	}
+	fmt.Println("Payment", p)
+
+	database.G.Save(&p)
+
+	c.JSON(http.StatusCreated, gin.H{"payment": p})
+
 }

@@ -101,6 +101,7 @@ func (ns *NullString) UnmarshalJSON(in []byte) error {
 	if str == `null` || str == `""` {
 		return nil
 	}
-	ns.Valid, ns.String = true, str
+
+	ns.Valid, ns.String = true, str[1:len(str)-1]
 	return nil
 }
