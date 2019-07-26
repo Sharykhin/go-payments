@@ -20,7 +20,8 @@ func CreateTransaction(c *gin.Context) {
 	}
 	u := entity.User{ID: r.UserID}
 	database.G.Find(&u)
-	fmt.Println(u)
+	fmt.Println("User", u)
+	fmt.Println()
 	p := entity.Payment{
 		TransactionID: "123451223",
 		User:          u,
@@ -29,10 +30,11 @@ func CreateTransaction(c *gin.Context) {
 		Amount:        r.Amount,
 		ChargeDate:    time.Now().UTC(),
 	}
-	fmt.Println("Payment", p)
+
+	fmt.Println("Payment Before", p)
 
 	database.G.Save(&p)
-
+	fmt.Println("Payment After", p)
 	c.JSON(http.StatusCreated, gin.H{"payment": p})
 
 }

@@ -29,6 +29,7 @@ func init() {
 		log.Panicf("failed to ping a database: %v", err)
 	}
 
+	db.LogMode(true)
 	G = db
 
 }

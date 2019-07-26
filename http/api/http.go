@@ -27,7 +27,7 @@ func ListenAndServe() error {
 		v1.GET("/ping", handler.Ping)
 		v1.POST("/register", handlerUser.Register)
 		v1.POST("/login", handlerAuth.Login)
-
+		v1.GET("/users/:id/payments", handlerUser.GetUserPayments)
 		auth := v1.Group("/")
 		//auth.Use(middleware.Auth())
 		auth.POST("/payments", handlerPayment.CreateTransaction)
