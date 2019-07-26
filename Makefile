@@ -4,7 +4,7 @@ dev:
 	docker-compose -f docker-compose.dev.yml up
 
 stop:
-	docker-compose -f docker-compose.dev.yml down
+	docker-compose -f docker-compose.dev.yml down && ps aux | grep "go run" | grep -v grep | awk '{print $2}' | xargs kill -9
 
 api:
 	API_ADDR=:8000 DATABASE_HOST=localhost DATABASE_PORT=54320 DATABASE_USER=root DATABASE_PASSWORD=root DATABASE_NAME=payments go run -race cmd/api/main.go
