@@ -14,6 +14,6 @@ type (
 		Password  string
 		CreatedAt time.Time
 		DeletedAt NullTime
-		Payments  []Payment `gorm:"PRELOAD:true;foreignkey:UserID"`
+		Payments  []Payment `gorm:"PRELOAD:true;foreignkey:UserID" json:"-"`
 	}
 )
