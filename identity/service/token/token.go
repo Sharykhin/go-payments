@@ -1,6 +1,14 @@
 package jwt
 
-import "time"
+import (
+	"time"
+
+	"github.com/Sharykhin/go-payments/identity/service/token/jwt"
+)
+
+const (
+	TYPE_JWF = iota
+)
 
 type (
 	// Tokener is a general interface that provides method for working
@@ -11,3 +19,10 @@ type (
 		Validate(token string) (map[string]interface{}, error)
 	}
 )
+
+func NewToken(tokenType string) Tokener {
+	switch tokenType {
+	case TYPE_JWF:
+		return jwt.NewJWT()
+	}
+}
