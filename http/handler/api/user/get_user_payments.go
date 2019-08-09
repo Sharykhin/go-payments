@@ -18,7 +18,7 @@ func GetUserPayments(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	fmt.Println("ID", id)
+
 	user := entity.User{
 		ID: int64(id),
 	}

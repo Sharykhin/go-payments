@@ -10,7 +10,8 @@ import (
 func JsonContentType() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cc := c.GetHeader("Content-Type")
-		if !strings.Contains(cc, "application/json") {
+		if (c.Request.Method == "POST" || c.Request.Method == "PUT") &&
+			!strings.Contains(cc, "application/json") {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Content-Type must be application/json"})
 			c.Abort()
 		}

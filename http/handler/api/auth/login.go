@@ -1,13 +1,15 @@
 package auth
 
 import (
-	"fmt"
+	"log"
 	"net/http"
+	"time"
+
+	"github.com/dgrijalva/jwt-go"
 
 	"github.com/Sharykhin/go-payments/database"
 	"github.com/Sharykhin/go-payments/entity"
 	"github.com/Sharykhin/go-payments/request"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -31,15 +33,17 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(c)
-	session.Set("user_id", user.ID)
-	err := session.Save()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":  user.ID,
+		"exp": time.Now().UTC().Add(1 * time.Second).Unix(),
+	})
+
+	tokenStr, err := token.SignedString([]byte("secret"))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wring"})
+		log.Printf("failed to create JWT token: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.SetCookie("pizda", "da", 1200, "/", "", true, true)
 
-	fmt.Println("session before", session.Get("user_id"))
-	c.JSON(http.StatusOK, gin.H{"user": &user})
+	c.JSON(http.StatusOK, gin.H{"user": &user, "token": tokenStr})
 }
