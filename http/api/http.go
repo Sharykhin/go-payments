@@ -27,7 +27,7 @@ func ListenAndServe() error {
 
 	auth := v1.Group("/")
 	{
-		auth.Use(middleware.Auth())
+		auth.Use(middleware.AuthByToken())
 		auth.GET("/users/:id/payments", handlerUser.GetUserPayments)
 		auth.POST("/payments", handlerPayment.CreateTransaction)
 	}

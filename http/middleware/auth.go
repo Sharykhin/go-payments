@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	tokenPkg "github.com/Sharykhin/go-payments/identity/service/token"
+
 	"github.com/dgrijalva/jwt-go"
 
 	"github.com/gin-gonic/gin"
@@ -13,11 +15,14 @@ import (
 
 const (
 	headerType = "Bearer "
+	authHeader = "Authorization"
 )
 
-func Auth() gin.HandlerFunc {
+var tokenService = tokenPkg.NewTokenService(tokenPkg.TypeJWF)
+
+func AuthByToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
+		authHeader := c.GetHeader(authHeader)
 		if !strings.Contains(authHeader, headerType) {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": "Authorization header with Bearer type is required",
@@ -26,15 +31,9 @@ func Auth() gin.HandlerFunc {
 		}
 
 		tokenString := authHeader[len(headerType):]
-		fmt.Println("token", tokenString)
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (i interface{}, e error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-			}
-			return []byte("secret"), nil
-		})
 
-		if err != nil {
+		claims, err := tokenService.Validate(tokenString)
+		if err != nil && err == TokenIs {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err.Error(),
 			})
