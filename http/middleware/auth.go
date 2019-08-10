@@ -1,16 +1,14 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
-	"time"
-
-	tokenPkg "github.com/Sharykhin/go-payments/identity/service/token"
-
-	"github.com/dgrijalva/jwt-go"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/Sharykhin/go-payments/entity"
+	tokenPkg "github.com/Sharykhin/go-payments/identity/service/token"
+	tokenErrors "github.com/Sharykhin/go-payments/identity/service/token/error"
 )
 
 const (
@@ -20,6 +18,8 @@ const (
 
 var tokenService = tokenPkg.NewTokenService(tokenPkg.TypeJWF)
 
+// AuthByToken checks the income requests based on Authorization headers
+// and after that populates the request with a user context
 func AuthByToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader(authHeader)
@@ -33,24 +33,26 @@ func AuthByToken() gin.HandlerFunc {
 		tokenString := authHeader[len(headerType):]
 
 		claims, err := tokenService.Validate(tokenString)
-		if err != nil && err == TokenIs {
+		if err != nil {
+			if err == tokenErrors.TokenIsExpired {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+					"error": "Token is expired",
+				})
+				return
+			}
+
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err.Error(),
 			})
 			return
+
+		}
+		uc := entity.UserContext{
+			ID:    int64(claims["id"].(float64)),
+			Roles: []entity.Role{entity.Role(claims["roles"].(string))},
 		}
 
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			exp := int64(claims["exp"].(float64))
-			if time.Now().UTC().Unix()-exp > 0 {
-				fmt.Println("Token expired")
-				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-					"error": "Token has been expired",
-				})
-				return
-			}
-		}
-
+		c.Set("UserContext", uc)
 		c.Next()
 	}
 }

@@ -16,4 +16,11 @@ type (
 		DeletedAt NullTime
 		Payments  []Payment `gorm:"PRELOAD:true;foreignkey:UserID" json:"-"`
 	}
+
+	Role string
+
+	UserContext struct {
+		ID    int64
+		Roles []Role
+	}
 )

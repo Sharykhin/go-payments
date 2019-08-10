@@ -1,17 +1,17 @@
 package jwt
 
 import (
-	"errors"
 	"fmt"
 	"time"
+
+	tokenErrors "github.com/Sharykhin/go-payments/identity/service/token/error"
 
 	jwtGo "github.com/dgrijalva/jwt-go"
 )
 
 var (
 	// TODO: take from ENV variable
-	secret         = []byte("secret")
-	TokenIsExpired = errors.New("token is expired")
+	secret = []byte("secret")
 )
 
 type (
@@ -46,7 +46,7 @@ func (JWT) Validate(tokenString string) (map[string]interface{}, error) {
 	if err != nil {
 		jwtErr := err.(*jwtGo.ValidationError)
 		if jwtErr.Errors == jwtGo.ValidationErrorExpired {
-			return nil, TokenIsExpired
+			return nil, tokenErrors.TokenIsExpired
 		}
 
 		return nil, fmt.Errorf("could not parse token string: %v", err)
