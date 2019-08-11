@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/Sharykhin/go-payments/database"
@@ -14,7 +15,7 @@ type (
 	}
 )
 
-func (r GORMRepository) Create(user entity.User) (*entity.User, error) {
+func (r GORMRepository) Create(ctx context.Context, user entity.User) (*entity.User, error) {
 	err := r.conn.Create(&user).Error
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert a new user row: %v", err)

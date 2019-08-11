@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"gopkg.in/go-playground/validator.v8"
+	entity2 "github.com/Sharykhin/go-payments/user/entity"
+
+	"github.com/Sharykhin/go-payments/user/service"
 
 	"github.com/Sharykhin/go-payments/database"
 	"github.com/Sharykhin/go-payments/entity"
@@ -35,6 +37,8 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong"})
 	}
 
+	userService := service.NewUserService()
+
 	//TODO: heck
 	user := entity.User{
 		FirstName: rr.FirstName,
@@ -45,7 +49,19 @@ func Register(c *gin.Context) {
 			Valid: false,
 		},
 	}
-	fmt.Println("user", user)
+
+	user2 := entity2.User{
+		FirstName: rr.FirstName,
+		LastName:  rr.LastName,
+		Email:     rr.Email,
+		DeletedAt: entity.NullTime{
+			Valid: false,
+		},
+	}
+
+	newUser, err := userService.Create(c.Request.Context(), user2)
+
+	fmt.Println("user", newUser, user)
 	database.G.Save(&user)
 
 	c.JSON(http.StatusCreated, gin.H{"user": user})
