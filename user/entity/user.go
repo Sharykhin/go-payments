@@ -3,6 +3,7 @@ package entity
 import (
 	"time"
 
+	"github.com/Sharykhin/go-payments/common/types"
 	"github.com/Sharykhin/go-payments/entity"
 )
 
@@ -13,6 +14,6 @@ type (
 		LastName  entity.NullString
 		Email     string
 		CreatedAt time.Time
-		DeletedAt entity.NullTime
+		DeletedAt types.NullTime
 	}
 )

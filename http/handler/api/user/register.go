@@ -2,6 +2,8 @@ package user
 
 import (
 	"fmt"
+	"github.com/Sharykhin/go-payments/common/types"
+	"gopkg.in/go-playground/validator.v8"
 	"net/http"
 
 	entity2 "github.com/Sharykhin/go-payments/user/entity"
@@ -54,7 +56,7 @@ func Register(c *gin.Context) {
 		FirstName: rr.FirstName,
 		LastName:  rr.LastName,
 		Email:     rr.Email,
-		DeletedAt: entity.NullTime{
+		DeletedAt: types.NullTime{
 			Valid: false,
 		},
 	}
