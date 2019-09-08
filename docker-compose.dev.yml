@@ -13,6 +13,13 @@ services:
     ports:
       - 54320:5432
 
+  maildev:
+    image: djfarrelly/maildev
+    ports:
+      - 1080:80
+      - 1025:25
+
+
 volumes:
   postgres_data:
 

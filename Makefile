@@ -7,7 +7,7 @@ stop:
 	docker-compose -f docker-compose.dev.yml down && ps aux | grep "go run" | grep -v grep | awk '{print $$2}' | xargs kill -2
 
 api:
-	API_ADDR=:8000 DATABASE_HOST=localhost DATABASE_PORT=54320 DATABASE_USER=root DATABASE_PASSWORD=root DATABASE_NAME=payments go run -race cmd/api/main.go
+	API_ADDR=:8000 DATABASE_HOST=localhost DATABASE_PORT=54320 DATABASE_USER=root DATABASE_PASSWORD=root DATABASE_NAME=payments CompileDaemon -exclude-dir=.git --build="go build -o api ./cmd/api" --command="./api"
 
 web:
 	WEB_ADDR=:8080 API_ADDR=http://localhost:8000 go run -race cmd/web/main.go

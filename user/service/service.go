@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Sharykhin/go-payments/identity/service/password"
+
+	"github.com/Sharykhin/go-payments/core/queue"
+
 	"github.com/Sharykhin/go-payments/user/repository"
 
 	"github.com/Sharykhin/go-payments/user/entity"
@@ -21,7 +25,7 @@ type (
 
 	UserService struct {
 		repository repository.Repository
-		events     []Event
+		dispatcher queue.Publisher
 	}
 
 	Event struct {
@@ -31,12 +35,19 @@ type (
 )
 
 func (us *UserService) Create(ctx context.Context, user entity.User) (*entity.User, error) {
+	hash, err := password.GeneratePassword(user.Password)
+	if err != nil {
+		return nil, fmt.Errorf("could not create a new user: %v", err)
+	}
+	user.Password = hash
 	newUser, err := us.repository.Create(ctx, user)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to create user")
+		return nil, fmt.Errorf("could not create a new user: %v", err)
 	}
-	us.events = append(us.events, NewEvent(UserCreatedEvent))
+
+	us.dispatcher.RaiseEvent(NewEvent(UserCreatedEvent))
+
 	return newUser, err
 }
 
@@ -50,6 +61,6 @@ func NewEvent(name string) Event {
 func NewUserService() *UserService {
 	return &UserService{
 		repository: repository.NewGORMRepository(),
-		events:     []Event{},
+		dispatcher: queue.New(queue.TypeLocal),
 	}
 }

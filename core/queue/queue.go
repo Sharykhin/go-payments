@@ -26,12 +26,13 @@ type (
 		Subscribe(name string, fn func(e event.Event))
 	}
 
-	Deferrer interface {
-		ReleaseEvents()
+	QueueManager interface {
+		Subscriber
+		Publisher
 	}
 )
 
-func NewReleaser(t int) Deferrer {
+func NewReleaser(t int) QueueManager {
 	switch t {
 	case TypeLocal:
 		return local.NewQueue()

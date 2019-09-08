@@ -12,6 +12,7 @@ type (
 		ID        int64 `gorm:"primary_key"`
 		FirstName string
 		LastName  entity.NullString
+		Password  string
 		Email     string
 		CreatedAt time.Time
 		DeletedAt types.NullTime
