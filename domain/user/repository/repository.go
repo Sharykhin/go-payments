@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/Sharykhin/go-payments/user/entity"
+	"github.com/Sharykhin/go-payments/domain/user/entity"
 )
 
 type (

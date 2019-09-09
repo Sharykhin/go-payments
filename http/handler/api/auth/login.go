@@ -6,16 +6,16 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/Sharykhin/go-payments/database"
 	"github.com/Sharykhin/go-payments/entity"
-	"github.com/Sharykhin/go-payments/request"
-	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
+	identityRequest "github.com/Sharykhin/go-payments/request/identity"
 )
 
 func Login(c *gin.Context) {
-	var lr request.LoginRequest
+	var lr identityRequest.LoginRequest
 	if err := c.BindJSON(&lr); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

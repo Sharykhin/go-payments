@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	tokenErrors "github.com/Sharykhin/go-payments/identity/service/token/error"
+	tokenErrors "github.com/Sharykhin/go-payments/domain/identity/service/token/error"
 
 	jwtGo "github.com/dgrijalva/jwt-go"
 )

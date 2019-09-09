@@ -1,4 +1,4 @@
-package request
+package user
 
 import "github.com/Sharykhin/go-payments/entity"
 

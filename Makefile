@@ -1,16 +1,10 @@
-.PHONY: dev
+.PHONY: serve stop migration migrate migrate-down migrate-status
 
-dev:
-	docker-compose -f docker-compose.dev.yml up
+serve:
+	docker-compose up
 
 stop:
-	docker-compose -f docker-compose.dev.yml down && ps aux | grep "go run" | grep -v grep | awk '{print $$2}' | xargs kill -2
-
-api:
-	API_ADDR=:8000 DATABASE_HOST=localhost DATABASE_PORT=54320 DATABASE_USER=root DATABASE_PASSWORD=root DATABASE_NAME=payments CompileDaemon -exclude-dir=.git --build="go build -o api ./cmd/api" --command="./api"
-
-web:
-	WEB_ADDR=:8080 API_ADDR=http://localhost:8000 go run -race cmd/web/main.go
+	docker-compose down
 
 migration:
 	goose -dir migrations create ${NAME} sql
@@ -20,3 +14,6 @@ migrate:
 
 migrate-down:
 	goose -dir migrations postgres "host=localhost user=root password=root dbname=payments sslmode=disable port=54320" down
+
+migrate-status:
+	goose -dir migrations postgres "host=localhost user=root password=root dbname=payments sslmode=disable port=54320" status

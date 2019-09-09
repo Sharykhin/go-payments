@@ -3,7 +3,7 @@ package jwt
 import (
 	"time"
 
-	"github.com/Sharykhin/go-payments/identity/service/token/jwt"
+	"github.com/Sharykhin/go-payments/domain/identity/service/token/jwt"
 )
 
 const (

@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/Sharykhin/go-payments/database"
 	"github.com/Sharykhin/go-payments/entity"
-
 	"github.com/Sharykhin/go-payments/request/payment"
-	"github.com/gin-gonic/gin"
 )
 
 func CreateTransaction(c *gin.Context) {

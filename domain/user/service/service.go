@@ -5,14 +5,10 @@ import (
 	"fmt"
 
 	"github.com/Sharykhin/go-payments/core/event"
-
-	"github.com/Sharykhin/go-payments/identity/service/password"
-
 	"github.com/Sharykhin/go-payments/core/queue"
-
-	"github.com/Sharykhin/go-payments/user/repository"
-
-	"github.com/Sharykhin/go-payments/user/entity"
+	"github.com/Sharykhin/go-payments/domain/identity/service/password"
+	"github.com/Sharykhin/go-payments/domain/user/entity"
+	"github.com/Sharykhin/go-payments/domain/user/repository"
 )
 
 type (

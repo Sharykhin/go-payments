@@ -1,4 +1,4 @@
-package request
+package identity
 
 type (
 	LoginRequest struct {

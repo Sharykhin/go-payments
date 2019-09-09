@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"github.com/Sharykhin/go-payments/core/type"
 	"time"
 )
 
@@ -9,11 +10,11 @@ type (
 	User struct {
 		ID        int64 `gorm:"primary_key"`
 		FirstName string
-		LastName  NullString
+		LastName  types.NullString
 		Email     string
 		Password  string
 		CreatedAt time.Time
-		DeletedAt NullTime
+		DeletedAt types.NullTime
 		Payments  []Payment `gorm:"PRELOAD:true;foreignkey:UserID" json:"-"`
 	}
 

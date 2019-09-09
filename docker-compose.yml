@@ -7,12 +7,12 @@ services:
       dockerfile: .docker/go/Dockerfile
     command: CompileDaemon -log-prefix=false -build="go build -o api ./cmd/api" -command="./api" --graceful-kill=true -color=true
     environment:
-      - API_ADDR=":8000"
-      - DATABASE_HOST="postgres"
-      - DATABASE_PORT="5432"
-      - DATABASE_USER="root"
-      - DATABASE_PASSWORD="root"
-      - DATABASE_NAME="payments"
+      - API_ADDR=:8000
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=root
+      - DATABASE_NAME=payments
     volumes:
       - .:/app
     depends_on:
@@ -21,6 +21,19 @@ services:
       - postgres
     ports:
       - 8000:8000
+
+  go-web:
+    build:
+      context: .
+      dockerfile: .docker/go/Dockerfile
+    command: CompileDaemon -log-prefix=false -build="go build -o web ./cmd/web" -command="./web" --graceful-kill=true -color=true
+    environment:
+      - WEB_ADDR=:8080
+      - API_ADDR=http://go-api:8000
+    volumes:
+      - .:/app
+    ports:
+      - 8080:8080
 
   postgres:
     image: postgres:11
@@ -38,6 +51,11 @@ services:
     ports:
       - 1080:80
       - 1025:25
+
+  rabbitmq:
+    image: rabbitmq:3.7.17-management-alpine
+    ports:
+      - 15672:15672
 
 
 volumes:
