@@ -6,9 +6,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/Sharykhin/go-payments/entity"
-	tokenPkg "github.com/Sharykhin/go-payments/identity/service/token"
-	tokenErrors "github.com/Sharykhin/go-payments/identity/service/token/error"
+	identityEntity "github.com/Sharykhin/go-payments/domain/identity/entity"
+	tokenPkg "github.com/Sharykhin/go-payments/domain/identity/service/token"
+	tokenErrors "github.com/Sharykhin/go-payments/domain/identity/service/token/error"
+	httpApp "github.com/Sharykhin/go-payments/http"
 )
 
 const (
@@ -47,12 +48,12 @@ func AuthByToken() gin.HandlerFunc {
 			return
 
 		}
-		uc := entity.UserContext{
+		uc := identityEntity.UserContext{
 			ID:    int64(claims["id"].(float64)),
-			Roles: []entity.Role{entity.Role(claims["roles"].(string))},
+			Roles: []identityEntity.Role{identityEntity.Role(claims["role"].(int64))},
 		}
 
-		c.Set("UserContext", uc)
+		c.Set(httpApp.UserContext, uc)
 		c.Next()
 	}
 }

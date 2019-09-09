@@ -3,13 +3,14 @@ package api
 import (
 	"os"
 
-	handler "github.com/Sharykhin/go-payments/http/handler/api"
-	handlerAuth "github.com/Sharykhin/go-payments/http/handler/api/auth"
-	handlerPayment "github.com/Sharykhin/go-payments/http/handler/api/payment"
-	handlerUser "github.com/Sharykhin/go-payments/http/handler/api/user"
-	"github.com/Sharykhin/go-payments/http/middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
+	handler "github.com/Sharykhin/go-payments/http/api/handler"
+	handlerAuth "github.com/Sharykhin/go-payments/http/api/handler/auth"
+	handlerPayment "github.com/Sharykhin/go-payments/http/api/handler/payment"
+	handlerUser "github.com/Sharykhin/go-payments/http/api/handler/user"
+	"github.com/Sharykhin/go-payments/http/middleware"
 )
 
 // ListenAndServe starts serving http requests

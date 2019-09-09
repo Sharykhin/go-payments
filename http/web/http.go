@@ -4,7 +4,7 @@ import (
 	"html/template"
 	"os"
 
-	handler "github.com/Sharykhin/go-payments/http/handler/web"
+	handler "github.com/Sharykhin/go-payments/http/web/handler"
 	"github.com/gin-gonic/gin"
 )
 
