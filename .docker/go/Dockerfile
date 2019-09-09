@@ -1,20 +1,13 @@
 FROM golang:1.12 as build-env
 
-ADD . /src
-
-WORKDIR /src
-
-RUN go get -v ./...
-
-RUN cd cmd/api && go build -o api
-
-FROM alpine
-
 WORKDIR /app
 
-COPY --from=build-env /src/cmd/api/api /app/
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
 
-ENTRYPOINT ./api
+COPY . .
 
+RUN ["go", "get", "github.com/githubnemo/CompileDaemon"]
 
-
+#ENTRYPOINT CompileDaemon -log-prefix=false -build="go build -o api ." -command="./api" --graceful-kill=true -color=true

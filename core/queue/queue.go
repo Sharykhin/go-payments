@@ -32,16 +32,7 @@ type (
 	}
 )
 
-func NewReleaser(t int) QueueManager {
-	switch t {
-	case TypeLocal:
-		return local.NewQueue()
-	default:
-		panic("invalid queue type")
-	}
-}
-
-func New(t int) Deferrer {
+func New(t int) QueueManager {
 	switch t {
 	case TypeLocal:
 		return local.NewQueue()
@@ -66,12 +57,4 @@ func NewSubscriber(t int) Subscriber {
 	default:
 		panic("invalid queue type")
 	}
-}
-
-func GetPublisher() Publisher {
-	return publisher
-}
-
-func GetReleaser() Deferrer {
-	return publisher
 }

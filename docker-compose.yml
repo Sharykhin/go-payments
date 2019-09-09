@@ -1,0 +1,45 @@
+version: '3.7'
+
+services:
+  go-api:
+    build:
+      context: .
+      dockerfile: .docker/go/Dockerfile
+    command: CompileDaemon -log-prefix=false -build="go build -o api ./cmd/api" -command="./api" --graceful-kill=true -color=true
+    environment:
+      - API_ADDR=":8000"
+      - DATABASE_HOST="postgres"
+      - DATABASE_PORT="5432"
+      - DATABASE_USER="root"
+      - DATABASE_PASSWORD="root"
+      - DATABASE_NAME="payments"
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    ports:
+      - 8000:8000
+
+  postgres:
+    image: postgres:11
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: payments
+    ports:
+      - 54320:5432
+
+  maildev:
+    image: djfarrelly/maildev
+    ports:
+      - 1080:80
+      - 1025:25
+
+
+volumes:
+  postgres_data:
+

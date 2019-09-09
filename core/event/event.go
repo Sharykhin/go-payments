@@ -2,6 +2,10 @@ package event
 
 import "time"
 
+const (
+	UserCreatedEvent = "UserCreated"
+)
+
 type (
 	Event struct {
 		Time time.Time
