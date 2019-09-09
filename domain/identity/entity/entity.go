@@ -19,4 +19,7 @@ type (
 		ID    int64
 		Roles []Role
 	}
+
+	TokenPayload struct {
+	}
 )
