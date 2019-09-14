@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Sharykhin/go-payments/database"
-	"github.com/Sharykhin/go-payments/user/entity"
+	"github.com/Sharykhin/go-payments/domain/user/entity"
 	"github.com/jinzhu/gorm"
 )
 
