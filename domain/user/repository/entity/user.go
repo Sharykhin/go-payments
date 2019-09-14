@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"github.com/Sharykhin/go-payments/domain/payment/repository/entity"
 	"time"
 
 	"github.com/Sharykhin/go-payments/core/type"
@@ -15,5 +16,6 @@ type (
 		Email     string
 		CreatedAt time.Time
 		DeletedAt types.NullTime
+		Payments  []entity.Payment `gorm:"PRELOAD:true;foreignkey:UserID" json:"-"`
 	}
 )

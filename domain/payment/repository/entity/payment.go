@@ -5,7 +5,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"github.com/Sharykhin/go-payments/domain/user/entity"
+	"github.com/Sharykhin/go-payments/domain/user/repository/entity"
 )
 
 type (
