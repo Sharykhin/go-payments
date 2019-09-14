@@ -12,9 +12,11 @@ type (
 		Name string
 		Data map[string]interface{}
 	}
+
+	Payload map[string]interface{}
 )
 
-func NewEvent(name string, data map[string]interface{}) Event {
+func NewEvent(name string, data Payload) Event {
 	return Event{
 		Time: time.Now().UTC(),
 		Name: name,

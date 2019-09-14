@@ -9,12 +9,16 @@ type (
 	}
 )
 
-func (q *Queue) RaiseEvent(e event.Event) {
+func (q *Queue) RaiseEvent(e event.Event) error {
 	q.events = append(q.events, e)
+
+	return nil
 }
 
-func (q *Queue) Subscribe(name string, fn func(e event.Event)) {
+func (q *Queue) Subscribe(name string, fn func(e event.Event)) error {
 	q.subscribers[name] = append(q.subscribers[name], fn)
+
+	return nil
 }
 
 func (q *Queue) ReleaseEvents() {

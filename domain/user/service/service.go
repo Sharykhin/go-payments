@@ -44,6 +44,6 @@ func (us *UserService) Create(ctx context.Context, user entity.User) (*entity.Us
 func NewUserService() *UserService {
 	return &UserService{
 		repository: repository.NewGORMRepository(),
-		dispatcher: queue.New(queue.TypeLocal),
+		dispatcher: queue.New(queue.RabbitMQ),
 	}
 }
