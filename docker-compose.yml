@@ -17,6 +17,7 @@ services:
       - .:/app
     depends_on:
       - postgres
+      - rabbitmq
     links:
       - postgres
     ports:
@@ -42,6 +43,8 @@ services:
     command: CompileDaemon -log-prefix=false -build="go build -o notification ./cmd/notification" -command="./notification" --graceful-kill=true -color=true
     volumes:
       - .:/app
+    depends_on:
+      - rabbitmq
 
   postgres:
     image: postgres:11

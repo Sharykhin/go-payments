@@ -3,7 +3,8 @@ package event
 import "time"
 
 const (
-	UserCreatedEvent = "UserCreated"
+	UserCreatedEvent    = "UserCreated"
+	PaymentCreatedEvent = "PaymentCreated"
 )
 
 type (
