@@ -31,9 +31,29 @@ services:
       - WEB_ADDR=:8080
       - API_ADDR=http://go-api:8000
     volumes:
-      - .:/app
+      - type: bind
+        source: .
+        target: /app
     ports:
       - 8080:8080
+
+  ping:
+    build:
+      context: .
+      dockerfile: .docker/go/Dockerfile
+    command: CompileDaemon -log-prefix=false -build="go build -o ping ./cmd/ping" -command="./ping" --graceful-kill=false -color=true
+    volumes:
+      - type: bind
+        source: .
+        target: /app
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        fluentd-async-connect: 'true'
+        fluentd-retry-wait: '5s'
+        fluentd-max-retries: '30'
+        tag: payments.service.ping
 
   postgres:
     image: postgres:11
@@ -57,7 +77,60 @@ services:
     ports:
       - 15672:15672
 
+  elasticsearch:
+    image: elasticsearch:6.8.3
+    expose:
+      - 9200
+    ports:
+      - 9200:9200
+    environment:
+      - cluster.name=go-payments-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - type: volume
+        source: elasticsearch_data
+        target: /usr/share/elasticsearch/data
+        volume:
+          nocopy: false #flag to disable copying of data from a container when a volume is created
+
+  kibana:
+    image: kibana:6.8.3
+    ports:
+      - 5601:5601
+    links:
+      - elasticsearch
+    depends_on:
+      - elasticsearch
+
+  fluentd:
+    build:
+      context: .
+      dockerfile: .docker/fluentd/Dockerfile
+    volumes:
+      - type: bind
+        source: .docker/fluentd/conf/fluent.conf
+        target: /fluentd/etc/fluent.conf
+    links:
+      - elasticsearch
+    depends_on:
+      - elasticsearch
+    ports:
+      - 24224:24224
+      - 24224:24224/udp
+
 
 volumes:
   postgres_data:
+    driver: local
+    name: "go-payments-postgres"
+  elasticsearch_data:
+    driver: local
+    name: "go-payments-elasticsearch"
 
