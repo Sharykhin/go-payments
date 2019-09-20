@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  go-api:
+  api:
     build:
       context: .
       dockerfile: .docker/go/Dockerfile
@@ -14,7 +14,9 @@ services:
       - DATABASE_PASSWORD=root
       - DATABASE_NAME=payments
     volumes:
-      - .:/app
+      - type: bind
+        source: .
+        target: /app
     depends_on:
       - postgres
     links:
@@ -22,7 +24,7 @@ services:
     ports:
       - 8000:8000
 
-  go-web:
+  web:
     build:
       context: .
       dockerfile: .docker/go/Dockerfile
@@ -49,7 +51,7 @@ services:
     logging:
       driver: "fluentd"
       options:
-        fluentd-address: localhost:24224
+        fluentd-address: fluentd:24224
         fluentd-async-connect: 'true'
         fluentd-retry-wait: '5s'
         fluentd-max-retries: '30'
@@ -61,7 +63,9 @@ services:
       dockerfile: .docker/go/Dockerfile
     command: CompileDaemon -log-prefix=false -build="go build -o notification ./cmd/notification" -command="./notification" --graceful-kill=true -color=true
     volumes:
-      - .:/app
+      - type: bind
+        source: .
+        target: /app
 
   postgres:
     image: postgres:11
@@ -87,10 +91,10 @@ services:
 
   elasticsearch:
     image: elasticsearch:6.8.3
-    expose:
-      - 9200
-    ports:
-      - 9200:9200
+#    expose:
+#      - 9200
+#    ports:
+#      - 9200:9200
     environment:
       - cluster.name=go-payments-cluster
       - bootstrap.memory_lock=true

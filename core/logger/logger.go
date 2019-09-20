@@ -1,7 +1,32 @@
 package logger
 
-import "log"
+import (
+	"log"
+	"os"
+)
 
-func Info(format string, v ...interface{}) {
-	log.Printf(format, v)
+var (
+	Log logger
+)
+
+type (
+	logger struct {
+		err *log.Logger
+		out *log.Logger
+	}
+)
+
+func init() {
+	Log = logger{
+		err: log.New(os.Stderr, "", 0),
+		out: log.New(os.Stdout, "", 0),
+	}
+}
+
+func (l logger) Info(format string, v ...interface{}) {
+	l.out.Printf(format, v...)
+}
+
+func (l logger) Error(format string, v ...interface{}) {
+	l.err.Printf(format, v...)
 }
