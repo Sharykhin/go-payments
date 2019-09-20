@@ -55,6 +55,14 @@ services:
         fluentd-max-retries: '30'
         tag: payments.service.ping
 
+  go-notification:
+    build:
+      context: .
+      dockerfile: .docker/go/Dockerfile
+    command: CompileDaemon -log-prefix=false -build="go build -o notification ./cmd/notification" -command="./notification" --graceful-kill=true -color=true
+    volumes:
+      - .:/app
+
   postgres:
     image: postgres:11
     volumes:

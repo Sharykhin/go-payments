@@ -7,8 +7,8 @@ import (
 	"github.com/Sharykhin/go-payments/core/event"
 	"github.com/Sharykhin/go-payments/core/queue"
 	"github.com/Sharykhin/go-payments/domain/identity/service/password"
-	"github.com/Sharykhin/go-payments/domain/user/entity"
 	"github.com/Sharykhin/go-payments/domain/user/repository"
+	"github.com/Sharykhin/go-payments/domain/user/repository/entity"
 )
 
 type (
@@ -17,7 +17,7 @@ type (
 	}
 
 	UserService struct {
-		repository repository.Repository
+		repository repository.UserRepository
 		dispatcher queue.Publisher
 	}
 )
@@ -44,6 +44,6 @@ func (us *UserService) Create(ctx context.Context, user entity.User) (*entity.Us
 func NewUserService() *UserService {
 	return &UserService{
 		repository: repository.NewGORMRepository(),
-		dispatcher: queue.New(queue.TypeLocal),
+		dispatcher: queue.New(queue.RabbitMQ),
 	}
 }

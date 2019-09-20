@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Sharykhin/go-payments/core/type"
+	//"github.com/Sharykhin/go-payments/domain/payment/repository/entity"
 )
 
 type (
@@ -15,5 +16,11 @@ type (
 		Email     string
 		CreatedAt time.Time
 		DeletedAt types.NullTime
+		//Payments  []entity.Payment `gorm:"PRELOAD:true;foreignkey:UserID" json:"-"`
+		Payments []Payment `gorm:"PRELOAD:true;foreignkey:UserID" json:"-"`
+	}
+
+	Payment struct {
+		TransactionID string
 	}
 )
