@@ -129,13 +129,15 @@ services:
       - type: bind
         source: .docker/fluentd/conf/fluent.conf
         target: /fluentd/etc/fluent.conf
-    links:
-      - elasticsearch
-    depends_on:
-      - elasticsearch
+    #links:
+    #  - elasticsearch
+    #depends_on:
+    #  - elasticsearch
     ports:
       - 24224:24224
       - 24224:24224/udp
+    networks:
+      - backend
 
 
 volumes:
@@ -146,3 +148,8 @@ volumes:
     driver: local
     name: "go-payments-elasticsearch"
 
+
+networks:
+  backend:
+    driver: bridge
+    name: "go-payments"
