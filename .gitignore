@@ -3,6 +3,10 @@
 vendor
 server
 api
+!cmd/api
 web
+!cmd/web
 notification
+!cmd/notification
 ping
+!cmd/ping
