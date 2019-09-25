@@ -19,6 +19,7 @@ services:
         target: /app
     depends_on:
       - postgres
+      - fluentd
     links:
       - postgres
     ports:
@@ -48,6 +49,8 @@ services:
       - type: bind
         source: .
         target: /app
+    depends_on:
+      - fluentd
     logging:
       driver: "fluentd"
       options:
@@ -57,7 +60,7 @@ services:
         fluentd-max-retries: '30'
         tag: payments.service.ping
 
-  go-notification:
+  notification:
     build:
       context: .
       dockerfile: .docker/go/Dockerfile
@@ -66,6 +69,16 @@ services:
       - type: bind
         source: .
         target: /app
+    depends_on:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        fluentd-async-connect: 'true'
+        fluentd-retry-wait: '5s'
+        fluentd-max-retries: '30'
+        tag: payments.service.notification
 
   postgres:
     image: postgres:11
@@ -81,8 +94,7 @@ services:
   maildev:
     image: djfarrelly/maildev
     ports:
-      - 1080:80
-      - 1025:25
+      - 1081:80
 
   rabbitmq:
     image: rabbitmq:3.7.17-management-alpine
