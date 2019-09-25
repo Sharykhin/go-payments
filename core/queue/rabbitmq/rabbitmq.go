@@ -20,13 +20,21 @@ var (
 
 type (
 	Queue struct {
-		ch *amqp.Channel
+		ch     *amqp.Channel
+		events map[string]struct{}
 	}
 )
 
-func (q *Queue) Subscribe(name string, fn func(e event.Event)) error {
-	qd, err := q.ch.QueueDeclare(
-		name,  // name
+func (q *Queue) Subscribe(tag, eventName string, fn func(e event.Event)) error {
+	q.events[eventName] = struct{}{}
+
+	qd, err := q.ch.QueueInspect(tag)
+	if err == nil {
+		return nil
+	}
+
+	qd, err = q.ch.QueueDeclare(
+		tag,   // name
 		false, // durable
 		false, // delete when usused
 		false, // exclusive
@@ -65,13 +73,15 @@ func (q *Queue) Subscribe(name string, fn func(e event.Event)) error {
 
 	go func() {
 		for d := range msgs {
-			var em event.Event
-			err := json.Unmarshal(d.Body, &em)
+			var ev event.Event
+			err := json.Unmarshal(d.Body, &ev)
 			if err != nil {
 				log.Printf("failed to parse income message: %v", err)
 			}
-			log.Printf("Consumer [%s] Received a message: %s", name, em)
-			fn(em)
+			if _, ok := q.events[ev.Name]; ok {
+				log.Printf("Consumer [%s] Received a message: %s", ev)
+				fn(ev)
+			}
 		}
 	}()
 
@@ -136,6 +146,7 @@ func init() {
 
 func NewQueue() *Queue {
 	return &Queue{
-		ch: ch,
+		ch:     ch,
+		events: map[string]struct{}{},
 	}
 }

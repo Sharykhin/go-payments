@@ -2,13 +2,11 @@ package queue
 
 import (
 	"github.com/Sharykhin/go-payments/core/event"
-	"github.com/Sharykhin/go-payments/core/queue/local"
 	"github.com/Sharykhin/go-payments/core/queue/rabbitmq"
 )
 
 const (
-	TypeLocal = iota
-	RabbitMQ
+	RabbitMQ = iota
 )
 
 type (
@@ -17,7 +15,7 @@ type (
 	}
 
 	Subscriber interface {
-		Subscribe(name string, fn func(e event.Event)) error
+		Subscribe(tag, eventName string, fn func(e event.Event)) error
 	}
 
 	QueueManager interface {
@@ -28,8 +26,6 @@ type (
 
 func New(t int) QueueManager {
 	switch t {
-	case TypeLocal:
-		return local.NewQueue()
 	case RabbitMQ:
 		return rabbitmq.NewQueue()
 	default:
