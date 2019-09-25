@@ -3,8 +3,9 @@ package rabbitmq
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/streadway/amqp"
 	"log"
+
+	"github.com/streadway/amqp"
 
 	"github.com/Sharykhin/go-payments/core/event"
 )
@@ -24,6 +25,39 @@ type (
 		events map[string]struct{}
 	}
 )
+
+func init() {
+	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
+	if err != nil {
+		log.Fatalf("Failled to connect to rabbitmq: %v", err)
+	}
+
+	//defer conn.Close()
+
+	ch, err = conn.Channel()
+	if err != nil {
+		log.Fatalf("Failed to open a channel: %v", err)
+	}
+	//defer ch.Close()
+
+	err = ch.ExchangeDeclare(
+		exchangeName, // name
+		"fanout",     // type
+		true,         // durable
+		false,        // auto-deleted
+		false,        // internal
+		false,        // no-wait
+		nil,          // arguments
+	)
+	if err != nil {
+		log.Fatalf("Failed to declare an exchange: %v", err)
+	}
+
+	Q = &Queue{
+		ch: ch,
+	}
+
+}
 
 func (q *Queue) Subscribe(tag, eventName string, fn func(e event.Event)) error {
 	q.events[eventName] = struct{}{}
@@ -109,39 +143,6 @@ func (q *Queue) RaiseEvent(e event.Event) error {
 	}
 
 	return nil
-}
-
-func init() {
-	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
-	if err != nil {
-		log.Fatalf("Failled to connect to rabbitmq: %v", err)
-	}
-
-	//defer conn.Close()
-
-	ch, err = conn.Channel()
-	if err != nil {
-		log.Fatalf("Failed to open a channel: %v", err)
-	}
-	//defer ch.Close()
-
-	err = ch.ExchangeDeclare(
-		exchangeName, // name
-		"fanout",     // type
-		true,         // durable
-		false,        // auto-deleted
-		false,        // internal
-		false,        // no-wait
-		nil,          // arguments
-	)
-	if err != nil {
-		log.Fatalf("Failed to declare an exchange: %v", err)
-	}
-
-	Q = &Queue{
-		ch: ch,
-	}
-
 }
 
 func NewQueue() *Queue {

@@ -22,6 +22,8 @@ services:
       - fluentd
     links:
       - postgres
+    expose:
+      - 8000
     ports:
       - 8000:8000
 
@@ -32,7 +34,7 @@ services:
     command: CompileDaemon -log-prefix=false -build="go build -o web ./cmd/web" -command="./web" --graceful-kill=true -color=true
     environment:
       - WEB_ADDR=:8080
-      - API_ADDR=http://go-api:8000
+      - API_ADDR=http://api:8000
     volumes:
       - type: bind
         source: .
@@ -88,23 +90,31 @@ services:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
       POSTGRES_DB: payments
+    expose:
+      - 5432
     ports:
       - 54320:5432
 
   maildev:
     image: djfarrelly/maildev
+    expose:
+      - 1025
     ports:
       - 1081:80
+    networks:
+      - go_payments
 
   rabbitmq:
     image: rabbitmq:3.7.17-management-alpine
+    expose:
+      - 5672
     ports:
       - 15672:15672
 
   elasticsearch:
     image: elasticsearch:6.8.3
-#    expose:
-#      - 9200
+    expose:
+      - 9200
 #    ports:
 #      - 9200:9200
     environment:
@@ -148,8 +158,6 @@ services:
     ports:
       - 24224:24224
       - 24224:24224/udp
-    networks:
-      - backend
 
 
 volumes:
@@ -162,6 +170,6 @@ volumes:
 
 
 networks:
-  backend:
+  go_payments:
     driver: bridge
-    name: "go-payments"
+    name: "go_payments"
