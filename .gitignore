@@ -4,7 +4,9 @@ vendor
 server
 api
 !cmd/api
+!http/api
 web
+!http/web
 !cmd/web
 notification
 !cmd/notification
