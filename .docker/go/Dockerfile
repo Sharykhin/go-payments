@@ -6,8 +6,8 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 
-COPY . .
+#COPY . .
 
-RUN ["go", "get", "github.com/githubnemo/CompileDaemon"]
+#RUN ["go", "get", "github.com/githubnemo/CompileDaemon"]
 
 #ENTRYPOINT CompileDaemon -log-prefix=false -build="go build -o api ." -command="./api" --graceful-kill=true -color=true

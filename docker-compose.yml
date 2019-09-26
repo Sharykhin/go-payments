@@ -26,6 +26,8 @@ services:
       - 8000
     ports:
       - 8000:8000
+    networks:
+      - go_payments
 
   web:
     build:
@@ -41,6 +43,8 @@ services:
         target: /app
     ports:
       - 8080:8080
+    networks:
+      - go_payments
 
   ping:
     build:
@@ -61,6 +65,8 @@ services:
         fluentd-retry-wait: '5s'
         fluentd-max-retries: '30'
         tag: payments.service.ping
+    networks:
+      - go_payments
 
   notification:
     build:
@@ -81,6 +87,8 @@ services:
         fluentd-retry-wait: '5s'
         fluentd-max-retries: '30'
         tag: payments.service.notification
+    networks:
+      - go_payments
 
   postgres:
     image: postgres:11
@@ -94,6 +102,8 @@ services:
       - 5432
     ports:
       - 54320:5432
+    networks:
+      - go_payments
 
   maildev:
     image: djfarrelly/maildev
@@ -110,6 +120,8 @@ services:
       - 5672
     ports:
       - 15672:15672
+    networks:
+      - go_payments
 
   elasticsearch:
     image: elasticsearch:6.8.3
@@ -133,6 +145,8 @@ services:
         target: /usr/share/elasticsearch/data
         volume:
           nocopy: false #flag to disable copying of data from a container when a volume is created
+    networks:
+      - go_payments
 
   kibana:
     image: kibana:6.8.3
@@ -142,6 +156,8 @@ services:
       - elasticsearch
     depends_on:
       - elasticsearch
+    networks:
+      - go_payments
 
   fluentd:
     build:
@@ -158,6 +174,8 @@ services:
     ports:
       - 24224:24224
       - 24224:24224/udp
+    networks:
+      - go_payments
 
 
 volumes:
