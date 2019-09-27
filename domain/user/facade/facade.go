@@ -32,5 +32,4 @@ func (a AppUserFacade) Create(ctx context.Context, req request.UserCreateRequest
 			Password: pass,
 		},
 	}, nil
-
 }
