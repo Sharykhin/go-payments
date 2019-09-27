@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 
-	"github.com/Sharykhin/go-payments/database"
+	"github.com/Sharykhin/go-payments/core/database"
 	userEntity "github.com/Sharykhin/go-payments/domain/user/repository/entity"
 )
 

@@ -7,12 +7,11 @@ import (
 	types "github.com/Sharykhin/go-payments/core/type"
 	"github.com/Sharykhin/go-payments/domain/user/application/request"
 
-	re "github.com/Sharykhin/go-payments/domain/user/repository/entity"
+	repositoryEntity "github.com/Sharykhin/go-payments/domain/user/repository/entity"
 
 	"github.com/Sharykhin/go-payments/core/event"
 	"github.com/Sharykhin/go-payments/core/logger"
 	"github.com/Sharykhin/go-payments/core/queue"
-	"github.com/Sharykhin/go-payments/domain/identity/service/password"
 	ae "github.com/Sharykhin/go-payments/domain/user/application/entity"
 	"github.com/Sharykhin/go-payments/domain/user/repository"
 )
@@ -34,17 +33,11 @@ type (
 
 // Create creates a new user and returns application user model
 func (us *AppUserService) Create(ctx context.Context, req request.UserCreateRequest) (*ae.User, error) {
-	hash, err := password.GeneratePassword(req.Password)
-	if err != nil {
-		return nil, fmt.Errorf("could not create a new user: %v", err)
-	}
-
 	//TODO: use factory
-	ure := re.User{
+	ure := repositoryEntity.User{
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
 		Email:     req.Email,
-		Password:  hash,
 		DeletedAt: types.NullTime{
 			Valid: false,
 		},
@@ -60,7 +53,7 @@ func (us *AppUserService) Create(ctx context.Context, req request.UserCreateRequ
 	appUser := ae.User{
 		ID: newUser.ID,
 		Identity: ae.Identity{
-			Password: newUser.Password,
+			Password: "",
 		},
 	}
 

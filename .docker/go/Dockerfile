@@ -6,6 +6,11 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 
+ARG install_goose
+
+RUN if [ $install_goose = "on" ] ; then go get -u github.com/pressly/goose/cmd/goose ; else echo Argument is $install_goose ; fi
+
+
 #COPY . .
 
 #RUN ["go", "get", "github.com/githubnemo/CompileDaemon"]

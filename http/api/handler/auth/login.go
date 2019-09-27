@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/Sharykhin/go-payments/database"
+	"github.com/Sharykhin/go-payments/core/database"
 	"github.com/Sharykhin/go-payments/domain/user/repository/entity"
 	identityRequest "github.com/Sharykhin/go-payments/http/request/identity"
 )

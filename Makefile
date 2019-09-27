@@ -7,13 +7,13 @@ stop:
 	docker-compose down
 
 migration:
-	goose -dir migrations create ${NAME} sql
+	docker-compose run migration goose -dir /migrations create ${NAME} sql
 
 migrate:
-	goose -dir migrations postgres "host=localhost user=root password=root dbname=payments sslmode=disable port=54320" up
+	docker-compose run migration goose -dir /migrations postgres "host=postgres user=root password=root dbname=payments sslmode=disable port=5432" up
 
 migrate-down:
-	goose -dir migrations postgres "host=localhost user=root password=root dbname=payments sslmode=disable port=54320" down
+	docker-compose run migration goose -dir /migrations postgres "host=postgres user=root password=root dbname=payments sslmode=disable port=5432" down
 
 migrate-status:
-	goose -dir migrations postgres "host=localhost user=root password=root dbname=payments sslmode=disable port=54320" status
+	docker-compose run migration goose -dir /migrations postgres "host=postgres user=root password=root dbname=payments sslmode=disable port=5432" status

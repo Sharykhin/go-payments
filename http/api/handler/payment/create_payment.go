@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/Sharykhin/go-payments/core/database"
 	"github.com/Sharykhin/go-payments/core/logger"
-	"github.com/Sharykhin/go-payments/database"
 	paymentEntity "github.com/Sharykhin/go-payments/domain/payment/repository/entity"
 	userEntity "github.com/Sharykhin/go-payments/domain/user/repository/entity"
 	"github.com/Sharykhin/go-payments/http/request/payment"
@@ -31,9 +31,9 @@ func CreatePayment(c *gin.Context) {
 		ChargeDate:    time.Now().UTC(),
 	}
 
-	logger.Info("Payment Before: %v", p)
+	logger.Log.Info("Payment Before: %v", p)
 	database.G.Save(&p)
-	logger.Info("Payment After: %v", p)
+	logger.Log.Info("Payment After: %v", p)
 	c.JSON(http.StatusCreated, gin.H{"payment": p})
 
 }

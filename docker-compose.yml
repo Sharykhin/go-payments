@@ -1,6 +1,19 @@
 version: '3.7'
 
 services:
+  migration:
+    build:
+      context: .
+      dockerfile: .docker/go/Dockerfile
+      args:
+        install_goose: "on"
+    volumes:
+      - type: bind
+        source: ./migrations
+        target: /migrations
+    networks:
+      - go_payments
+
   api:
     build:
       context: .
@@ -20,6 +33,7 @@ services:
     depends_on:
       - postgres
       - fluentd
+      - rabbitmq
     links:
       - postgres
     expose:
