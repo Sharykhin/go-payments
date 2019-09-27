@@ -3,13 +3,17 @@ package auth
 import (
 	"net/http"
 
+	"github.com/Sharykhin/go-payments/core/event"
+	"github.com/Sharykhin/go-payments/core/logger"
+
+	"github.com/Sharykhin/go-payments/core/locator"
+
 	identityEntity "github.com/Sharykhin/go-payments/domain/identity/entity"
 	"github.com/Sharykhin/go-payments/domain/user/application/request"
 
 	"github.com/gin-gonic/gin"
 	validator "gopkg.in/go-playground/validator.v8"
 
-	"github.com/Sharykhin/go-payments/domain/user/service"
 	ur "github.com/Sharykhin/go-payments/http/request/user"
 )
 
@@ -28,8 +32,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// TODO: think about creating some sort of service locator
-	userService := service.NewUserService()
+	userService := locator.GetUserService()
 
 	user, err := userService.Create(c.Request.Context(), request.UserCreateRequest{
 		FirstName: rr.FirstName,
@@ -42,6 +45,14 @@ func Register(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+	dispatcher := locator.GetDefaultQueue()
+
+	err = dispatcher.RaiseEvent(event.NewEvent(event.UserRegisteredEvent, event.Payload{
+		"ID": user.ID,
+	}))
+	if err != nil {
+		logger.Log.Error("failed to dispatch event %s: %v", event.UserRegisteredEvent, err)
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"user": user})

@@ -3,8 +3,10 @@ package event
 import "time"
 
 const (
+	// TODO: replace with iota
 	UserCreatedEvent    = "UserCreated"
 	PaymentCreatedEvent = "PaymentCreated"
+	UserRegisteredEvent = "UserRegisteredEvent"
 )
 
 type (

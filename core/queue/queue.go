@@ -6,7 +6,8 @@ import (
 )
 
 const (
-	RabbitMQ = iota
+	RabbitMQ     = iota
+	DefaultQueue = RabbitMQ
 )
 
 type (
@@ -26,6 +27,16 @@ type (
 
 func New(t int) QueueManager {
 	switch t {
+	case RabbitMQ:
+		return rabbitmq.NewQueue()
+	default:
+		panic("invalid queue type")
+	}
+}
+
+//Default returns a default queue manager
+func Default() QueueManager {
+	switch DefaultQueue {
 	case RabbitMQ:
 		return rabbitmq.NewQueue()
 	default:
