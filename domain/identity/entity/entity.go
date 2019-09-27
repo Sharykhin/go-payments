@@ -6,7 +6,7 @@ type Role int64
 
 const (
 	RoleAnon = Role(iota) + 100
-	RoleUser
+	RoleConsumer
 	RoleAdmin
 	RoleSuperAdmin
 )

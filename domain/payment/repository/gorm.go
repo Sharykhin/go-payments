@@ -7,7 +7,7 @@ import (
 	"github.com/jinzhu/gorm"
 
 	GORMDB "github.com/Sharykhin/go-payments/core/database/gorm"
-	"github.com/Sharykhin/go-payments/domain/user/repository/entity"
+	"github.com/Sharykhin/go-payments/domain/payment/repository/entity"
 )
 
 type (
@@ -18,21 +18,20 @@ type (
 	}
 )
 
-// Create creates a new user in a database and returns just created record
-func (r GORMRepository) Create(ctx context.Context, user entity.User) (*entity.User, error) {
-	err := r.conn.Create(&user).Error
+// Create creates a new payment in a database and returns just created record
+func (r GORMRepository) Create(cxt context.Context, payment entity.Payment) (*entity.Payment, error) {
+	err := r.conn.Create(&payment).Error
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert a new user row: %v", err)
 	}
 
-	return &user, nil
+	return &payment, nil
 }
 
-// NewGORMRepository is a constructor function
-// that returns a new instance of GORMRepository
+// NewGORMRepository is a constructor function that returns a new instance of GORMRepository
+// and satisfies PaymentRepository interface
 func NewGORMRepository() *GORMRepository {
 	return &GORMRepository{
-		//conn: database.G,
 		conn: GORMDB.G,
 	}
 }

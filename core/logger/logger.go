@@ -10,6 +10,11 @@ var (
 )
 
 type (
+	Logger interface {
+		Info(format string, v ...interface{})
+		Error(format string, v ...interface{})
+	}
+
 	logger struct {
 		err *log.Logger
 		out *log.Logger

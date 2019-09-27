@@ -3,12 +3,12 @@ package auth
 import (
 	"net/http"
 
+	identityEntity "github.com/Sharykhin/go-payments/domain/identity/entity"
+	"github.com/Sharykhin/go-payments/domain/user/application/request"
+
 	"github.com/gin-gonic/gin"
 	validator "gopkg.in/go-playground/validator.v8"
 
-	"github.com/Sharykhin/go-payments/core/logger"
-	"github.com/Sharykhin/go-payments/core/type"
-	userEntity "github.com/Sharykhin/go-payments/domain/user/repository/entity"
 	"github.com/Sharykhin/go-payments/domain/user/service"
 	ur "github.com/Sharykhin/go-payments/http/request/user"
 )
@@ -28,24 +28,21 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	// TODO: think about creating some sort of service locator
 	userService := service.NewUserService()
 
-	user := userEntity.User{
+	user, err := userService.Create(c.Request.Context(), request.UserCreateRequest{
 		FirstName: rr.FirstName,
 		LastName:  rr.LastName,
 		Email:     rr.Email,
-		DeletedAt: types.NullTime{
-			Valid: false,
-		},
-	}
+		Password:  rr.Password,
+		Role:      identityEntity.RoleConsumer,
+	})
 
-	newUser, err := userService.Create(c.Request.Context(), user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	logger.Info("user: %v", newUser)
 
 	c.JSON(http.StatusCreated, gin.H{"user": user})
 }

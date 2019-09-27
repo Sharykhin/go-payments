@@ -12,7 +12,7 @@ func GeneratePassword(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
-		return "", fmt.Errorf("could not generate password: %v", err)
+		return "", fmt.Errorf("could not generate bcrypt password: %v", err)
 	}
 
 	return string(hash), nil
