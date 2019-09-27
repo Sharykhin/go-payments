@@ -23,5 +23,5 @@ type (
 )
 
 func (u *User) GetPayments() []Payment {
-
+	return nil
 }
