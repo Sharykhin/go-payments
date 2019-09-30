@@ -10,9 +10,8 @@ ARG install_goose
 
 RUN if [ $install_goose = "on" ] ; then go get -u github.com/pressly/goose/cmd/goose ; else echo Argument is $install_goose ; fi
 
+COPY . .
 
-#COPY . .
-
-#RUN ["go", "get", "github.com/githubnemo/CompileDaemon"]
+RUN ["go", "get", "github.com/githubnemo/CompileDaemon"]
 
 #ENTRYPOINT CompileDaemon -log-prefix=false -build="go build -o api ." -command="./api" --graceful-kill=true -color=true

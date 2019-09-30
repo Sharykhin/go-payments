@@ -2,6 +2,7 @@ package locator
 
 import (
 	"github.com/Sharykhin/go-payments/core/queue"
+	"github.com/Sharykhin/go-payments/domain/identity/service/identity"
 	"github.com/Sharykhin/go-payments/domain/user/service"
 )
 
@@ -28,5 +29,14 @@ func GetUserService() service.UserService {
 	}
 	inst := service.NewUserService()
 	instances["UserService"] = inst
+	return inst
+}
+
+func NeUserAuthenticationService() identity.UserAuthentication {
+	if _, ok := instances["UserAuthentication"]; ok {
+		return instances["UserAuthentication"].(identity.UserAuthentication)
+	}
+	inst := identity.NewUserAuthenticationService()
+	instances["UserAuthentication"] = inst
 	return inst
 }

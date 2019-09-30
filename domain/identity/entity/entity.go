@@ -22,4 +22,6 @@ type (
 
 	TokenPayload struct {
 	}
+
+	Token string
 )
