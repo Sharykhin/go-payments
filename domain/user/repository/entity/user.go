@@ -23,3 +23,17 @@ type (
 		TransactionID string
 	}
 )
+
+func NewUser(firstName, lastName, email string) User {
+	return User{
+		FirstName: firstName,
+		LastName: types.NullString{
+			Valid:  lastName != "",
+			String: lastName,
+		},
+		Email: email,
+		DeletedAt: types.NullTime{
+			Valid: false,
+		},
+	}
+}

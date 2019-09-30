@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"net/http"
+	"github.com/Sharykhin/go-payments/http"
 
 	"github.com/Sharykhin/go-payments/core/event"
 	"github.com/Sharykhin/go-payments/core/logger"
@@ -17,7 +17,8 @@ import (
 	ur "github.com/Sharykhin/go-payments/http/request/user"
 )
 
-// Register
+// Register method creates a new consumer in the system.
+// Then it raises a separate event so we can send a welcome email if it is necessary
 func Register(c *gin.Context) {
 	var rr ur.RegisterRequest
 
@@ -28,7 +29,10 @@ func Register(c *gin.Context) {
 		for _, v := range validationErrors {
 			errors[v.Name] = v.ActualTag
 		}
-		c.JSON(http.StatusBadRequest, gin.H{"error": errors})
+
+		http.BadRequest(c, http.Data{
+			"Errors": errors,
+		})
 		return
 	}
 
@@ -43,17 +47,26 @@ func Register(c *gin.Context) {
 	})
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		http.BadRequest(c, http.Data{
+			"Errors": []string{err.Error()},
+		})
 		return
 	}
+
+	raiseSuccessfulRegistration(user.ID)
+
+	http.Created(c, http.Data{
+		"user": user,
+	}, nil)
+}
+
+func raiseSuccessfulRegistration(userId int64) {
 	dispatcher := locator.GetDefaultQueue()
 
-	err = dispatcher.RaiseEvent(event.NewEvent(event.UserRegisteredEvent, event.Payload{
-		"ID": user.ID,
+	err := dispatcher.RaiseEvent(event.NewEvent(event.UserRegisteredEvent, event.Payload{
+		"ID": userId,
 	}))
 	if err != nil {
 		logger.Log.Error("failed to dispatch event %s: %v", event.UserRegisteredEvent, err)
 	}
-
-	c.JSON(http.StatusCreated, gin.H{"user": user})
 }

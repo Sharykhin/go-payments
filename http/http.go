@@ -1,9 +1,10 @@
 package http
 
 import (
-	"github.com/Sharykhin/go-payments/core"
 	httpCodes "net/http"
 	"time"
+
+	"github.com/Sharykhin/go-payments/core"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,6 +26,16 @@ type (
 func OK(c *gin.Context, data Data, meta Meta) {
 	response := newResponse(httpCodes.StatusOK, data, meta)
 	c.JSON(httpCodes.StatusOK, response)
+}
+
+func Created(c *gin.Context, data Data, meta Meta) {
+	response := newResponse(httpCodes.StatusCreated, data, meta)
+	c.JSON(httpCodes.StatusCreated, response)
+}
+
+func BadRequest(c *gin.Context, data Data) {
+	response := newResponse(httpCodes.StatusBadRequest, data, nil)
+	c.JSON(httpCodes.StatusBadRequest, response)
 }
 
 func newResponse(code int, data Data, meta Meta) Response {

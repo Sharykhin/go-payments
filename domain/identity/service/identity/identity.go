@@ -34,7 +34,7 @@ func (a AppUserIdentity) CreatePassword(ctx context.Context, userID int64, pass 
 	return up.Password, nil
 }
 
-func NewIdentityService() *AppUserIdentity {
+func NewUserIdentityService() *AppUserIdentity {
 	return &AppUserIdentity{
 		repository: repository.GORMRepository{},
 		logger:     logger.Log,

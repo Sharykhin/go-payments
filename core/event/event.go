@@ -4,9 +4,10 @@ import "time"
 
 const (
 	// TODO: replace with iota
-	UserCreatedEvent    = "UserCreated"
-	PaymentCreatedEvent = "PaymentCreated"
-	UserRegisteredEvent = "UserRegisteredEvent"
+	UserCreatedEvent                = "UserCreated"
+	PaymentCreatedEvent             = "PaymentCreated"
+	UserRegisteredEvent             = "UserRegisteredEvent"
+	UserPasswordCreationFailedEvent = "UserPasswordCreationFailedEvent"
 )
 
 type (
