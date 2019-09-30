@@ -2,7 +2,7 @@
 -- SQL in this section is executed when the migration is applied.
 CREATE TABLE user_passwords
 (
-    id bigint NOT NULL,
+    id serial NOT NULL,
     user_id bigint NOT NULL,
     password character varying(80) NOT NULL,
     created_at timestamp without time zone NOT NULL,

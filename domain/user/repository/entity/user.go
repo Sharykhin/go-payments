@@ -24,6 +24,7 @@ type (
 	}
 )
 
+// NewUser creates a new repository user entity
 func NewUser(firstName, lastName, email string) User {
 	return User{
 		FirstName: firstName,

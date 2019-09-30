@@ -13,8 +13,8 @@ import (
 func main() {
 	q := queue.New(queue.RabbitMQ)
 
-	err := q.Subscribe("notification", event.UserCreatedEvent, func(e event.Event) {
-		fmt.Println("Got message", e)
+	err := q.Subscribe("notification", event.UserRegisteredEvent, func(e event.Event) {
+		fmt.Println("User Registered", e)
 	})
 
 	if err != nil {

@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	instances map[string]interface{}
+	instances map[string]interface{} = make(map[string]interface{})
 )
 
 // GetDefaultQueue returns a default queue manager

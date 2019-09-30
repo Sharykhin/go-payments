@@ -8,6 +8,8 @@ import (
 const (
 	RabbitMQ     = iota
 	DefaultQueue = RabbitMQ
+
+	TagNotification = iota
 )
 
 type (

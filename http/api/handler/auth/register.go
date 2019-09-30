@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"fmt"
+
 	"github.com/Sharykhin/go-payments/http"
 
 	"github.com/Sharykhin/go-payments/core/event"
@@ -25,14 +27,11 @@ func Register(c *gin.Context) {
 	// TODO: heck
 	if err := c.ShouldBindJSON(&rr); err != nil {
 		validationErrors := err.(validator.ValidationErrors)
-		errors := make(map[string]string, len(validationErrors))
+		var errors []string
 		for _, v := range validationErrors {
-			errors[v.Name] = v.ActualTag
+			errors = append(errors, fmt.Sprintf("%s %s", v.Field, v.ActualTag))
 		}
-
-		http.BadRequest(c, http.Data{
-			"Errors": errors,
-		})
+		http.BadRequest(c, http.Errors(errors))
 		return
 	}
 
@@ -47,9 +46,7 @@ func Register(c *gin.Context) {
 	})
 
 	if err != nil {
-		http.BadRequest(c, http.Data{
-			"Errors": []string{err.Error()},
-		})
+		http.BadRequest(c, http.Errors{err.Error()})
 		return
 	}
 
@@ -69,4 +66,6 @@ func raiseSuccessfulRegistration(userId int64) {
 	if err != nil {
 		logger.Log.Error("failed to dispatch event %s: %v", event.UserRegisteredEvent, err)
 	}
+
+	logger.Log.Info("Raised an event %s", event.UserRegisteredEvent)
 }

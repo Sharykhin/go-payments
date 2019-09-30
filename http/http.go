@@ -15,30 +15,32 @@ const (
 
 type (
 	Response struct {
-		StatusCode int  `json:"StatusCode"`
-		Data       Data `json:"Data"`
-		Meta       Meta `json:"Meta"`
+		StatusCode int    `json:"StatusCode"`
+		Errors     Errors `json:"errors"`
+		Data       Data   `json:"Data"`
+		Meta       Meta   `json:"Meta"`
 	}
-	Data map[string]interface{}
-	Meta map[string]interface{}
+	Errors []string
+	Data   map[string]interface{}
+	Meta   map[string]interface{}
 )
 
 func OK(c *gin.Context, data Data, meta Meta) {
-	response := newResponse(httpCodes.StatusOK, data, meta)
+	response := newResponse(httpCodes.StatusOK, data, meta, nil)
 	c.JSON(httpCodes.StatusOK, response)
 }
 
 func Created(c *gin.Context, data Data, meta Meta) {
-	response := newResponse(httpCodes.StatusCreated, data, meta)
+	response := newResponse(httpCodes.StatusCreated, data, meta, nil)
 	c.JSON(httpCodes.StatusCreated, response)
 }
 
-func BadRequest(c *gin.Context, data Data) {
-	response := newResponse(httpCodes.StatusBadRequest, data, nil)
+func BadRequest(c *gin.Context, errors Errors) {
+	response := newResponse(httpCodes.StatusBadRequest, nil, nil, errors)
 	c.JSON(httpCodes.StatusBadRequest, response)
 }
 
-func newResponse(code int, data Data, meta Meta) Response {
+func newResponse(code int, data Data, meta Meta, errors Errors) Response {
 	if meta == nil {
 		meta = Meta{}
 	}
@@ -47,5 +49,6 @@ func newResponse(code int, data Data, meta Meta) Response {
 		StatusCode: code,
 		Data:       data,
 		Meta:       meta,
+		Errors:     errors,
 	}
 }

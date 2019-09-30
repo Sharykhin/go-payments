@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/streadway/amqp"
 
@@ -27,10 +28,11 @@ type (
 )
 
 func init() {
-	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
+	conn, err := connect(5)
 	if err != nil {
-		log.Fatalf("Failled to connect to rabbitmq: %v", err)
+		log.Fatalf("failed to connect to rabbitmq: %v", err)
 	}
+	log.Println("Connected to RabbitMQ")
 
 	//defer conn.Close()
 
@@ -39,6 +41,8 @@ func init() {
 		log.Fatalf("Failed to open a channel: %v", err)
 	}
 	//defer ch.Close()
+
+	log.Println("Created a channel")
 
 	err = ch.ExchangeDeclare(
 		exchangeName, // name
@@ -59,15 +63,29 @@ func init() {
 
 }
 
+func connect(tries uint8) (*amqp.Connection, error) {
+	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
+	if err != nil {
+		if tries--; tries == 0 {
+			return nil, err
+		}
+		time.Sleep(2 * time.Second)
+		return connect(tries)
+	}
+
+	return conn, err
+}
+
 func (q *Queue) Subscribe(tag, eventName string, fn func(e event.Event)) error {
 	q.events[eventName] = struct{}{}
 
-	qd, err := q.ch.QueueInspect(tag)
-	if err == nil {
-		return nil
-	}
-
-	qd, err = q.ch.QueueDeclare(
+	//qd, err := q.ch.QueueInspect(tag)
+	//log.Println("Error:", err)
+	//if err == nil {
+	//	return nil
+	//}
+	log.Println("HA HA?")
+	qd, err := q.ch.QueueDeclarePassive(
 		tag,   // name
 		false, // durable
 		false, // delete when usused
