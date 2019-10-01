@@ -4,17 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Sharykhin/go-payments/domain/identity/service/identity"
-
-	"github.com/Sharykhin/go-payments/domain/user/application/request"
-
-	userRepositoryEntity "github.com/Sharykhin/go-payments/domain/user/repository/entity"
-
 	"github.com/Sharykhin/go-payments/core/event"
 	"github.com/Sharykhin/go-payments/core/logger"
 	"github.com/Sharykhin/go-payments/core/queue"
+	"github.com/Sharykhin/go-payments/domain/identity/service/identity"
 	userApplicationEntity "github.com/Sharykhin/go-payments/domain/user/application/entity"
+	"github.com/Sharykhin/go-payments/domain/user/application/request"
 	"github.com/Sharykhin/go-payments/domain/user/repository"
+	userRepositoryEntity "github.com/Sharykhin/go-payments/domain/user/repository/entity"
 )
 
 type (
@@ -32,6 +29,17 @@ type (
 		logger         logger.Logger
 	}
 )
+
+// NewUserService returns a new instance of AppUserService
+// that actually implements UserService interface
+func NewUserService() *AppUserService {
+	return &AppUserService{
+		userRepository: repository.NewGORMRepository(),
+		userIdentity:   identity.NewUserIdentityService(),
+		dispatcher:     queue.New(queue.RabbitMQ),
+		logger:         logger.Log,
+	}
+}
 
 // Create creates a new user and returns application user model
 func (us *AppUserService) Create(ctx context.Context, req request.UserCreateRequest) (*userApplicationEntity.User, error) {
@@ -74,14 +82,5 @@ func (us *AppUserService) raiseUserSuccessCreation(userId int64) {
 
 	if err != nil {
 		us.logger.Error("failed to dispatch %s event: %v", event.UserCreatedEvent, err)
-	}
-}
-
-func NewUserService() *AppUserService {
-	return &AppUserService{
-		userRepository: repository.NewGORMRepository(),
-		userIdentity:   identity.NewUserIdentityService(),
-		dispatcher:     queue.New(queue.RabbitMQ),
-		logger:         logger.Log,
 	}
 }
