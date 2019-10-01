@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Sharykhin/go-payments/core/event"
+
+	"github.com/Sharykhin/go-payments/core/queue"
+
 	"github.com/Sharykhin/go-payments/domain/identity/entity"
 	"github.com/dgrijalva/jwt-go"
 
@@ -26,6 +30,7 @@ type (
 	AppUserIdentity struct {
 		repository repository.IdentityRepository
 		logger     logger.Logger
+		dispatcher queue.Publisher
 	}
 
 	AppUserAuthentication struct {
@@ -44,7 +49,20 @@ func (a AppUserIdentity) CreatePassword(ctx context.Context, userID int64, pass 
 		return "", fmt.Errorf("failed to create a new user password: %v", err)
 	}
 
+	a.raiseSuccessfulPasswordCreation(up.ID, userID)
+
 	return up.Password, nil
+}
+
+func (a AppUserIdentity) raiseSuccessfulPasswordCreation(userPasswordID uint64, userID int64) {
+	err := a.dispatcher.RaiseEvent(event.NewEvent(event.UserPasswordCreatedEvent, event.Payload{
+		"userPasswordID": userPasswordID,
+		"userID":         userID,
+	}))
+
+	if err != nil {
+		a.logger.Error("failed to raise an event %s: %v", event.UserPasswordCreatedEvent, err)
+	}
 }
 
 func (a AppUserAuthentication) SingIn(ctx context.Context, email, password string) (entity.Token, error) {
@@ -66,6 +84,7 @@ func NewUserIdentityService() *AppUserIdentity {
 	return &AppUserIdentity{
 		repository: repository.NewGORMRepository(),
 		logger:     logger.Log,
+		dispatcher: queue.Default(),
 	}
 }
 

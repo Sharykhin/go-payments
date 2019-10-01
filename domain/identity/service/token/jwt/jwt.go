@@ -38,7 +38,7 @@ func (JWT) Generate(claims map[string]interface{}, expiration time.Duration) (st
 func (JWT) Validate(tokenString string) (map[string]interface{}, error) {
 	token, err := jwtGo.Parse(tokenString, func(token *jwtGo.Token) (i interface{}, e error) {
 		if _, ok := token.Method.(*jwtGo.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return secret, nil
 	})

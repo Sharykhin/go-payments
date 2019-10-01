@@ -8,6 +8,7 @@ const (
 	PaymentCreatedEvent             = "PaymentCreated"
 	UserRegisteredEvent             = "UserRegisteredEvent"
 	UserPasswordCreationFailedEvent = "UserPasswordCreationFailedEvent"
+	UserPasswordCreatedEvent        = "UserPasswordCreatedEvent"
 )
 
 type (
