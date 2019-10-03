@@ -11,5 +11,6 @@ type (
 	// a storage layer
 	UserRepository interface {
 		Create(cxt context.Context, user entity.User) (*entity.User, error)
+		FindByEmail(ctx context.Context, email string) (*entity.User, error)
 	}
 )

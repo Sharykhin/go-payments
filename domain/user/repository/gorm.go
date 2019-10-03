@@ -18,6 +18,15 @@ type (
 	}
 )
 
+// NewGORMRepository is a constructor function
+// that returns a new instance of GORMRepository
+func NewGORMRepository() *GORMRepository {
+	return &GORMRepository{
+		//conn: database.G,
+		conn: GORMDB.G,
+	}
+}
+
 // Create creates a new user in a database and returns just created record
 func (r GORMRepository) Create(ctx context.Context, user entity.User) (*entity.User, error) {
 	err := r.conn.Create(&user).Error
@@ -28,11 +37,17 @@ func (r GORMRepository) Create(ctx context.Context, user entity.User) (*entity.U
 	return &user, nil
 }
 
-// NewGORMRepository is a constructor function
-// that returns a new instance of GORMRepository
-func NewGORMRepository() *GORMRepository {
-	return &GORMRepository{
-		//conn: database.G,
-		conn: GORMDB.G,
+func (r GORMRepository) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
+	user := entity.User{Email: email}
+	err := r.conn.Model(user).First(&user).Error
+
+	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			// TODO: we need to check general error not found errors on repository layer
+			return nil, fmt.Errorf("conlt not find user: %v", err)
+		}
+		return nil, fmt.Errorf("failed to apply select statement to retreive user by email %s: %v", email, err)
 	}
+
+	return &user, nil
 }

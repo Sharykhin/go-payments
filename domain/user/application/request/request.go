@@ -15,4 +15,9 @@ type (
 		Email     string
 		Role      identityEntity.Role
 	}
+
+	UserSignInRequest struct {
+		Email    string
+		Password string
+	}
 )

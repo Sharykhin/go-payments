@@ -7,6 +7,7 @@ import (
 	"github.com/Sharykhin/go-payments/core/event"
 	"github.com/Sharykhin/go-payments/core/logger"
 	"github.com/Sharykhin/go-payments/core/queue"
+	identityApplicationEntity "github.com/Sharykhin/go-payments/domain/identity/application/entity"
 	"github.com/Sharykhin/go-payments/domain/identity/service/identity"
 	userApplicationEntity "github.com/Sharykhin/go-payments/domain/user/application/entity"
 	"github.com/Sharykhin/go-payments/domain/user/application/request"
@@ -19,6 +20,7 @@ type (
 	// fully creation user flow
 	UserService interface {
 		Create(ctx context.Context, req request.UserCreateRequest) (*userApplicationEntity.User, error)
+		SingIn(ctx context.Context, req request.UserSignInRequest) (*userApplicationEntity.User, identityApplicationEntity.Token, error)
 	}
 
 	// AppUserService is a main instance that would satisfy UserService interface
@@ -39,6 +41,10 @@ func NewUserService() *AppUserService {
 		dispatcher:     queue.New(queue.RabbitMQ),
 		logger:         logger.Log,
 	}
+}
+
+func (us *AppUserService) SingIn(ctx context.Context, req request.UserSignInRequest) (*userApplicationEntity.User, identityApplicationEntity.Token, error) {
+	return nil, "", nil
 }
 
 // Create creates a new user and returns application user model
