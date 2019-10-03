@@ -17,3 +17,7 @@ func GeneratePassword(password string) (string, error) {
 
 	return string(hash), nil
 }
+
+func ComparePasswords(password, hash string) error {
+	return nil
+}

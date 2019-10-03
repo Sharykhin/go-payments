@@ -11,5 +11,6 @@ type (
 	// a storage layer
 	IdentityRepository interface {
 		CreatePassword(cxt context.Context, userID int64, password string) (*entity.UserPassword, error)
+		FindPasswordByUserID(cxt context.Context, userID int64) ([]entity.UserPassword, error)
 	}
 )

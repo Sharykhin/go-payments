@@ -21,6 +21,8 @@ import (
 type (
 	UserIdentity interface {
 		CreatePassword(ctx context.Context, userID int64, password string) (string, error)
+		FindUserPassword(ctx context.Context, userID int64) (string, error)
+		ValidatePassword(ctx context.Context, password string, compare string) (bool, error)
 	}
 
 	UserAuthentication interface {
@@ -52,6 +54,23 @@ func (a AppUserIdentity) CreatePassword(ctx context.Context, userID int64, pass 
 	a.raiseSuccessfulPasswordCreation(up.ID, userID)
 
 	return up.Password, nil
+}
+
+func (a AppUserIdentity) FindUserPassword(ctx context.Context, userID int64) (string, error) {
+	up, err := a.repository.FindPasswordByUserID(ctx, userID)
+	if err != nil {
+		return "", fmt.Errorf("could not find user password: %v", err)
+	}
+
+	if len(up) == 0 {
+		return "", fmt.Errorf("you have no a valid password")
+	}
+
+	return up[0].Password, nil
+}
+
+func (a AppUserIdentity) ValidatePassword(ctx context.Context, password string, compare string) (bool, error) {
+
 }
 
 func (a AppUserIdentity) raiseSuccessfulPasswordCreation(userPasswordID uint64, userID int64) {
