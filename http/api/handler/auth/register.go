@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"fmt"
+	"github.com/Sharykhin/go-payments/http/validation"
 
 	"github.com/Sharykhin/go-payments/http"
 
@@ -14,7 +14,6 @@ import (
 	"github.com/Sharykhin/go-payments/domain/user/application/request"
 
 	"github.com/gin-gonic/gin"
-	validator "gopkg.in/go-playground/validator.v8"
 
 	ur "github.com/Sharykhin/go-payments/http/request/user"
 )
@@ -24,13 +23,7 @@ import (
 func Register(c *gin.Context) {
 	var rr ur.RegisterRequest
 
-	// TODO: heck
-	if err := c.ShouldBindJSON(&rr); err != nil {
-		validationErrors := err.(validator.ValidationErrors)
-		var errors []string
-		for _, v := range validationErrors {
-			errors = append(errors, fmt.Sprintf("%s %s", v.Field, v.ActualTag))
-		}
+	if isValid, errors := validation.ValidateRequest(c, rr); !isValid {
 		http.BadRequest(c, http.Errors(errors))
 		return
 	}

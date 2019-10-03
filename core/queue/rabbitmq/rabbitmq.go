@@ -79,13 +79,14 @@ func connect(tries uint8) (*amqp.Connection, error) {
 func (q *Queue) Subscribe(tag, eventName string, fn func(e event.Event)) error {
 	q.events[eventName] = struct{}{}
 
+	// TODO: need to think how not to declare queue each time Subscribe is called
 	//qd, err := q.ch.QueueInspect(tag)
 	//log.Println("Error:", err)
 	//if err == nil {
 	//	return nil
 	//}
-	log.Println("HA HA?")
-	qd, err := q.ch.QueueDeclarePassive(
+
+	qd, err := q.ch.QueueDeclare(
 		tag,   // name
 		false, // durable
 		false, // delete when usused
