@@ -16,7 +16,7 @@ const (
 type (
 	Response struct {
 		StatusCode int    `json:"StatusCode"`
-		Errors     Errors `json:"errors"`
+		Errors     Errors `json:"Errors"`
 		Data       Data   `json:"Data"`
 		Meta       Meta   `json:"Meta"`
 	}

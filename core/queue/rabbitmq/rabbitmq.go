@@ -20,10 +20,12 @@ var (
 	Q  *Queue
 )
 
+type EventCallback func(e event.Event)
+
 type (
 	Queue struct {
 		ch     *amqp.Channel
-		events map[string]struct{}
+		events map[string][]EventCallback
 	}
 )
 
@@ -77,8 +79,12 @@ func connect(tries uint8) (*amqp.Connection, error) {
 }
 
 func (q *Queue) Subscribe(tag, eventName string, fn func(e event.Event)) error {
-	q.events[eventName] = struct{}{}
 
+	if _, ok := q.events[eventName]; !ok {
+		q.events[eventName] = []EventCallback{}
+	}
+	q.events[eventName] = append(q.events[eventName], fn)
+	log.Printf("QUEUE FOR EVENT NAME %s: %v", eventName, q.events[eventName])
 	// TODO: need to think how not to declare queue each time Subscribe is called
 	//qd, err := q.ch.QueueInspect(tag)
 	//log.Println("Error:", err)
@@ -131,9 +137,14 @@ func (q *Queue) Subscribe(tag, eventName string, fn func(e event.Event)) error {
 			if err != nil {
 				log.Printf("failed to parse income message: %v", err)
 			}
+			log.Printf("Got message from rabbitmq: %s, %v", ev.Name, ev.Data)
+			log.Printf("Queue is the following: %v", q.events)
 			if _, ok := q.events[ev.Name]; ok {
-				log.Printf("Consumer [%s] Received a message: %s", ev)
-				fn(ev)
+				log.Printf("Raise all callbacks for event name %s: %v", ev.Name, q.events[ev.Name])
+				// TODO: probably it's better to call all callbacks in gorouttines?
+				for _, fn := range q.events[ev.Name] {
+					fn(ev)
+				}
 			}
 		}
 	}()
@@ -167,6 +178,6 @@ func (q *Queue) RaiseEvent(e event.Event) error {
 func NewQueue() *Queue {
 	return &Queue{
 		ch:     ch,
-		events: map[string]struct{}{},
+		events: map[string][]EventCallback{},
 	}
 }

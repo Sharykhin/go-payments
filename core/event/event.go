@@ -9,6 +9,7 @@ const (
 	UserRegisteredEvent             = "UserRegisteredEvent"
 	UserPasswordCreationFailedEvent = "UserPasswordCreationFailedEvent"
 	UserPasswordCreatedEvent        = "UserPasswordCreatedEvent"
+	UserSignIn                      = "UserSignIn"
 )
 
 type (

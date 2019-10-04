@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	"net/http"
 	"strings"
+
+	"github.com/Sharykhin/go-payments/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,7 +13,7 @@ func JsonContentType() gin.HandlerFunc {
 		cc := c.GetHeader("Content-Type")
 		if (c.Request.Method == "POST" || c.Request.Method == "PUT") &&
 			!strings.Contains(cc, "application/json") {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Content-Type must be application/json"})
+			http.BadRequest(c, http.Errors{"Content-Type must be application/json"})
 			c.Abort()
 		}
 

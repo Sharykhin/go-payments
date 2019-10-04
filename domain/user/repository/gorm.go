@@ -7,6 +7,8 @@ import (
 	"github.com/jinzhu/gorm"
 
 	GORMDB "github.com/Sharykhin/go-payments/core/database/gorm"
+	"github.com/Sharykhin/go-payments/core/errors"
+	"github.com/Sharykhin/go-payments/core/logger"
 	"github.com/Sharykhin/go-payments/domain/user/repository/entity"
 )
 
@@ -37,16 +39,18 @@ func (r GORMRepository) Create(ctx context.Context, user entity.User) (*entity.U
 	return &user, nil
 }
 
+// FindByEmail looks for user by its email and takes the first one.
+// Actually email should be unique
 func (r GORMRepository) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
 	user := entity.User{Email: email}
-	err := r.conn.Model(user).First(&user).Error
+	err := r.conn.Where(&user).First(&user).Error
 
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			// TODO: we need to check general error not found errors on repository layer
-			return nil, fmt.Errorf("conlt not find user: %v", err)
+			return nil, errors.ResourceNotFound
 		}
-		return nil, fmt.Errorf("failed to apply select statement to retreive user by email %s: %v", email, err)
+		logger.Error("gorm could not execute select statement to find user by email: %v", err)
+		return nil, fmt.Errorf("repository failed to find user by email %s: %v", email, err)
 	}
 
 	return &user, nil

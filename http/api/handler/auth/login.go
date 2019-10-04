@@ -1,27 +1,41 @@
 package auth
 
 import (
-	"fmt"
-	"net/http"
+	"github.com/Sharykhin/go-payments/core/errors"
+	"github.com/Sharykhin/go-payments/core/logger"
+	"github.com/Sharykhin/go-payments/domain/user/application/request"
+
+	"github.com/Sharykhin/go-payments/http"
+
+	"github.com/Sharykhin/go-payments/http/validation"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/Sharykhin/go-payments/core/locator"
-	identityRequest "github.com/Sharykhin/go-payments/http/request/identity"
+	ar "github.com/Sharykhin/go-payments/http/request/auth"
 )
 
 func Login(c *gin.Context) {
-	var req identityRequest.LoginRequest
-	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var req ar.LoginRequest
+	if isValid, errors := validation.ValidateRequest(c, &req); !isValid {
+		http.BadRequest(c, http.Errors(errors))
 		return
 	}
 
 	auth := locator.NeUserAuthenticationService()
-	token, err := auth.SingIn(c.Request.Context(), req.Email, req.Password)
-	if err != nil {
-		fmt.Println(err)
-	}
+	user, token, err := auth.SingIn(c.Request.Context(), request.UserSignInRequest{
+		Email:    req.Email,
+		Password: req.Password,
+	})
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	if err != nil {
+		logger.Error("user with request data %v could not to sign in: %v", req, err)
+		http.BadRequest(c, http.Errors{errors.CredentialsDoNotMatch.Error()})
+		return
+	}
+	logger.Info("user ID %d successfully signed in: %v", user.ID)
+	http.OK(c, http.Data{
+		"User":  user,
+		"Token": token,
+	}, nil)
 }

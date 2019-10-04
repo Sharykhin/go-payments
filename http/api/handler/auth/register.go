@@ -1,40 +1,34 @@
 package auth
 
 import (
-	"github.com/Sharykhin/go-payments/http/validation"
-
-	"github.com/Sharykhin/go-payments/http"
-
-	"github.com/Sharykhin/go-payments/core/event"
-	"github.com/Sharykhin/go-payments/core/logger"
-
-	"github.com/Sharykhin/go-payments/core/locator"
-
-	identityEntity "github.com/Sharykhin/go-payments/domain/identity/entity"
-	"github.com/Sharykhin/go-payments/domain/user/application/request"
-
 	"github.com/gin-gonic/gin"
 
-	ur "github.com/Sharykhin/go-payments/http/request/user"
+	"github.com/Sharykhin/go-payments/core/event"
+	"github.com/Sharykhin/go-payments/core/locator"
+	"github.com/Sharykhin/go-payments/core/logger"
+	identityEntity "github.com/Sharykhin/go-payments/domain/identity/entity"
+	"github.com/Sharykhin/go-payments/domain/user/application/request"
+	"github.com/Sharykhin/go-payments/http"
+	ar "github.com/Sharykhin/go-payments/http/request/auth"
+	"github.com/Sharykhin/go-payments/http/validation"
 )
 
 // Register method creates a new consumer in the system.
 // Then it raises a separate event so we can send a welcome email if it is necessary
 func Register(c *gin.Context) {
-	var rr ur.RegisterRequest
-
-	if isValid, errors := validation.ValidateRequest(c, rr); !isValid {
+	var req ar.RegisterRequest
+	if isValid, errors := validation.ValidateRequest(c, &req); !isValid {
 		http.BadRequest(c, http.Errors(errors))
 		return
 	}
 
-	userService := locator.GetUserService()
+	userService := locator.GetUserCommanderService()
 
 	user, err := userService.Create(c.Request.Context(), request.UserCreateRequest{
-		FirstName: rr.FirstName,
-		LastName:  rr.LastName,
-		Email:     rr.Email,
-		Password:  rr.Password,
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+		Email:     req.Email,
+		Password:  req.Password,
 		Role:      identityEntity.RoleConsumer,
 	})
 
@@ -46,7 +40,7 @@ func Register(c *gin.Context) {
 	raiseSuccessfulRegistration(user.ID)
 
 	http.Created(c, http.Data{
-		"user": user,
+		"User": user,
 	}, nil)
 }
 

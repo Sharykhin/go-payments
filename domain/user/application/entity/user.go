@@ -1,8 +1,6 @@
 package entity
 
 import (
-	"time"
-
 	"github.com/Sharykhin/go-payments/domain/user/repository/entity"
 
 	types "github.com/Sharykhin/go-payments/core/type"
@@ -10,13 +8,13 @@ import (
 
 type (
 	User struct {
-		ID        int64            `json:"id"`
-		FirstName string           `json:"first_name"`
-		LastName  types.NullString `json:"last_name"`
-		Email     string           `json:"email"`
-		CreatedAt time.Time        `json:"created_at"`
+		ID        int64            `json:"ID"`
+		FirstName string           `json:"FirstName"`
+		LastName  types.NullString `json:"LastName"`
+		Email     string           `json:"Email"`
+		CreatedAt types.Time       `json:"Created"`
 		Identity  Identity         `json:"-"`
-		Payments  []Payment        `json:"payments,omitempty"`
+		Payments  []Payment        `json:"Payments,omitempty"`
 	}
 
 	Identity struct {
@@ -36,7 +34,7 @@ func NewUserFromRepository(user *entity.User, pass string) *User {
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
-		CreatedAt: user.CreatedAt,
+		CreatedAt: types.Time(user.CreatedAt),
 		Identity: Identity{
 			Password: pass,
 		},

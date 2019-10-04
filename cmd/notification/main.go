@@ -21,6 +21,9 @@ func main() {
 		log.Fatalf("faield to subscribe on event: %v", err)
 	}
 
+	err = q.Subscribe("notification", event.UserSignIn, func(e event.Event) {
+		log.Println("HA HA HA I KNOW I COULD", e.Data, e.Time)
+	})
 	quit := make(chan os.Signal, 1)
 
 	signal.Notify(quit, os.Interrupt)

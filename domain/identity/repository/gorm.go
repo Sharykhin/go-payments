@@ -34,7 +34,7 @@ func (r GORMRepository) CreatePassword(cxt context.Context, userID int64, passwo
 
 func (r GORMRepository) FindPasswordByUserID(cxt context.Context, userID int64) ([]entity.UserPassword, error) {
 	var up []entity.UserPassword
-	err := r.conn.Model(entity.UserPassword{UserID: userID}).Order("created_at desc").Find(&up).Error
+	err := r.conn.Where(entity.UserPassword{UserID: userID}).Order("created_at desc").Find(&up).Error
 	if err != nil {
 		return nil, fmt.Errorf("could execute find password by user id: %v", err)
 	}

@@ -18,6 +18,6 @@ func GeneratePassword(password string) (string, error) {
 	return string(hash), nil
 }
 
-func ComparePasswords(password, hash string) error {
-	return nil
+func ComparePasswords(pass, hash string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(pass))
 }

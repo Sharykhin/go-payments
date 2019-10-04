@@ -35,3 +35,11 @@ func (l logger) Info(format string, v ...interface{}) {
 func (l logger) Error(format string, v ...interface{}) {
 	l.err.Printf(format, v...)
 }
+
+func Info(format string, v ...interface{}) {
+	Log.Info(format, v...)
+}
+
+func Error(format string, v ...interface{}) {
+	Log.Error(format, v...)
+}

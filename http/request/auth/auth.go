@@ -1,8 +1,6 @@
-package user
+package auth
 
-import (
-	types "github.com/Sharykhin/go-payments/core/type"
-)
+import types "github.com/Sharykhin/go-payments/core/type"
 
 type (
 	RegisterRequest struct {
@@ -10,5 +8,10 @@ type (
 		LastName  types.NullString `json:"LastName" binding:"max=80"`
 		Email     string           `json:"Email" binding:"required,email,max=80"`
 		Password  string           `json:"Password" binding:"required,min=8"`
+	}
+
+	LoginRequest struct {
+		Email    string `json:"email" binding:"required,email,max=80"`
+		Password string `json:"password" binding:"required"`
 	}
 )
