@@ -1,9 +1,9 @@
 .PHONY: serve stop stats migration migrate-up migrate-down migrate-status
 
-serve:
+up:
 	docker-compose up
 
-stop:
+down:
 	docker-compose down
 
 stats:

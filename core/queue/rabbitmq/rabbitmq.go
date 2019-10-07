@@ -84,7 +84,7 @@ func (q *Queue) Subscribe(tag, eventName string, fn func(e event.Event)) error {
 		q.events[eventName] = []EventCallback{}
 	}
 	q.events[eventName] = append(q.events[eventName], fn)
-	log.Printf("QUEUE FOR EVENT NAME %s: %v", eventName, q.events[eventName])
+
 	// TODO: need to think how not to declare queue each time Subscribe is called
 	//qd, err := q.ch.QueueInspect(tag)
 	//log.Println("Error:", err)
@@ -138,12 +138,10 @@ func (q *Queue) Subscribe(tag, eventName string, fn func(e event.Event)) error {
 				log.Printf("failed to parse income message: %v", err)
 			}
 			log.Printf("Got message from rabbitmq: %s, %v", ev.Name, ev.Data)
-			log.Printf("Queue is the following: %v", q.events)
 			if _, ok := q.events[ev.Name]; ok {
 				log.Printf("Raise all callbacks for event name %s: %v", ev.Name, q.events[ev.Name])
-				// TODO: probably it's better to call all callbacks in gorouttines?
 				for _, fn := range q.events[ev.Name] {
-					fn(ev)
+					go fn(ev)
 				}
 			}
 		}
