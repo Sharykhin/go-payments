@@ -20,7 +20,7 @@ services:
       dockerfile: .docker/go/Dockerfile
       args:
         install_goose: "off"
-    command: CompileDaemon -log-prefix=false -build="go build -o api ./cmd/api" -command="./api" --graceful-kill=true -color=true
+    command: bash -c '/wait.sh && CompileDaemon -log-prefix=false -build="go build -o api ./cmd/api" -command="./api" --graceful-kill=true -color=true'
     environment:
       - API_ADDR=:8000
       - DATABASE_HOST=postgres
@@ -95,7 +95,7 @@ services:
       dockerfile: .docker/go/Dockerfile
       args:
         install_goose: "off"
-    command: CompileDaemon -log-prefix=false -build="go build -o notification ./cmd/notification" -command="./notification" --graceful-kill=true -color=true
+    command: bash -c '/wait.sh && CompileDaemon -log-prefix=false -build="go build -o notification ./cmd/notification" -command="./notification" --graceful-kill=true -color=true'
     volumes:
       - type: bind
         source: .

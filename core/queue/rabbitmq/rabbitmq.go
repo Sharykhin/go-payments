@@ -30,7 +30,7 @@ type (
 )
 
 func init() {
-	conn, err := connect(5)
+	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
 	if err != nil {
 		log.Fatalf("failed to connect to rabbitmq: %v", err)
 	}
@@ -63,19 +63,6 @@ func init() {
 		ch: ch,
 	}
 
-}
-
-func connect(tries uint8) (*amqp.Connection, error) {
-	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
-	if err != nil {
-		if tries--; tries == 0 {
-			return nil, err
-		}
-		time.Sleep(2 * time.Second)
-		return connect(tries)
-	}
-
-	return conn, err
 }
 
 func (q *Queue) Subscribe(tag, eventName string, fn func(e event.Event)) error {

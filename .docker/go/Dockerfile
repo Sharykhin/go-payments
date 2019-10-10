@@ -12,6 +12,10 @@ RUN if [ $install_goose = "on" ] ; then go get -u github.com/pressly/goose/cmd/g
 
 COPY . .
 
+COPY .docker/go/wait.sh /wait.sh
+
 RUN ["go", "get", "github.com/githubnemo/CompileDaemon"]
+
+#ENTRYPOINT bash /run.sh
 
 #ENTRYPOINT CompileDaemon -log-prefix=false -build="go build -o api ." -command="./api" --graceful-kill=true -color=true
