@@ -30,6 +30,9 @@ services:
       - DATABASE_USER=root
       - DATABASE_PASSWORD=root
       - DATABASE_NAME=payments
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASS=guest
+      - RABBITMQ_HOST=rabbitmq
     volumes:
       - type: bind
         source: .
@@ -105,6 +108,10 @@ services:
       - type: bind
         source: .
         target: /app
+    environment:
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASS=guest
+      - RABBITMQ_HOST=rabbitmq
     links:
       - rabbitmq
     depends_on:

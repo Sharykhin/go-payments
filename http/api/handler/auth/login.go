@@ -1,24 +1,21 @@
 package auth
 
 import (
-	"github.com/Sharykhin/go-payments/core/errors"
-	"github.com/Sharykhin/go-payments/core/logger"
-	"github.com/Sharykhin/go-payments/domain/user/application/request"
-
-	"github.com/Sharykhin/go-payments/http"
-
-	"github.com/Sharykhin/go-payments/http/validation"
-
 	"github.com/gin-gonic/gin"
 
+	"github.com/Sharykhin/go-payments/core/errors"
 	"github.com/Sharykhin/go-payments/core/locator"
+	"github.com/Sharykhin/go-payments/core/logger"
+	"github.com/Sharykhin/go-payments/domain/user/application/request"
+	"github.com/Sharykhin/go-payments/http"
 	ar "github.com/Sharykhin/go-payments/http/request/auth"
+	"github.com/Sharykhin/go-payments/http/validation"
 )
 
 func Login(c *gin.Context) {
 	var req ar.LoginRequest
-	if isValid, errors := validation.ValidateRequest(c, &req); !isValid {
-		http.BadRequest(c, http.Errors(errors))
+	if isValid, err := validation.ValidateRequest(c, &req); !isValid {
+		http.BadRequest(c, http.Errors(err))
 		return
 	}
 

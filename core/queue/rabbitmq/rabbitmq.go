@@ -3,8 +3,9 @@ package rabbitmq
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Sharykhin/go-payments/core/deferrer"
 	"log"
-	"time"
+	"os"
 
 	"github.com/streadway/amqp"
 
@@ -30,19 +31,44 @@ type (
 )
 
 func init() {
-	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
+	defer func() {
+		if err := recover(); err != nil {
+			deferrer.Flush()
+			log.Fatalf("Terminating: %v", err)
+		}
+	}()
+
+	conn, err := amqp.Dial(fmt.Sprintf(
+		"amqp://%s:%s@%s:5672/",
+		os.Getenv("RABBITMQ_USER"),
+		os.Getenv("RABBITMQ_PASS"),
+		os.Getenv("RABBITMQ_HOST"),
+	))
 	if err != nil {
-		log.Fatalf("failed to connect to rabbitmq: %v", err)
+		log.Panicf("failed to connect to RabbitMQ: %v", err)
 	}
 	log.Println("Connected to RabbitMQ")
 
-	//defer conn.Close()
+	deferrer.QueueDeffer(func() {
+		log.Println("Gracefully closing RabbitMQ connection")
+		err := conn.Close()
+		if err != nil {
+			log.Printf("failed to close RabbitMQ connection: %v", err)
+		}
+	})
 
 	ch, err = conn.Channel()
 	if err != nil {
-		log.Fatalf("Failed to open a channel: %v", err)
+		log.Panicf("Failed to open a channel: %v", err)
 	}
-	//defer ch.Close()
+
+	deferrer.QueueDeffer(func() {
+		log.Println("Gracefully closing RabbitMQ channel")
+		err := ch.Close()
+		if err != nil {
+			log.Printf("failed to close rabbitmq channel: %v", err)
+		}
+	})
 
 	log.Println("Created a channel")
 
@@ -56,7 +82,7 @@ func init() {
 		nil,          // arguments
 	)
 	if err != nil {
-		log.Fatalf("Failed to declare an exchange: %v", err)
+		log.Panicf("Failed to declare an exchange: %v", err)
 	}
 
 	Q = &Queue{
@@ -65,6 +91,10 @@ func init() {
 
 }
 
+// Subscribe subscribes on an specific event with providing tag
+// that in scope of RabbitMQ will create a new queue.
+// This is done to allow multiple instances of the same service not to
+// get the same message.
 func (q *Queue) Subscribe(tag, eventName string, fn func(e event.Event)) error {
 
 	if _, ok := q.events[eventName]; !ok {
