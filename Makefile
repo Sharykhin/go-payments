@@ -1,4 +1,7 @@
-.PHONY: serve stop stats migration migrate-up migrate-down migrate-status
+.PHONY: build up stop stats migration migrate-up migrate-down migrate-status
+
+build:
+	docker-compose build
 
 up:
 	docker-compose up

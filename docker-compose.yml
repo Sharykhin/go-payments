@@ -22,7 +22,7 @@ services:
       args:
         install_goose: "off"
         install_compile_deamon: "on"
-    command: bash -c '/rabbitmq.sh && CompileDaemon -log-prefix=false -build="go build -o api ./cmd/api" -command="./api" --graceful-kill=true -color=true'
+    command: bash -c '/rabbitmq.sh && CompileDaemon -log-prefix=false -build="go build -race -o api ./cmd/api" -command="./api" --graceful-kill=true -color=true'
     environment:
       - API_ADDR=:8000
       - DATABASE_HOST=postgres
@@ -58,7 +58,7 @@ services:
       args:
         install_goose: "off"
         install_compile_deamon: "on"
-    command: CompileDaemon -log-prefix=false -build="go build -o web ./cmd/web" -command="./web" --graceful-kill=true -color=true
+    command: CompileDaemon -log-prefix=false -build="go build -race -o web ./cmd/web" -command="./web" --graceful-kill=true -color=true
     environment:
       - WEB_ADDR=:8080
       - API_ADDR=http://api:8000
@@ -78,7 +78,7 @@ services:
       args:
         install_goose: "off"
         install_compile_deamon: "on"
-    command: bash -c '/fluentd.sh && CompileDaemon -log-prefix=false -build="go build -o ping ./cmd/ping" -command="./ping" --graceful-kill=false -color=true'
+    command: bash -c '/fluentd.sh && CompileDaemon -log-prefix=false -build="go build -race -o ping ./cmd/ping" -command="./ping" --graceful-kill=false -color=true'
     volumes:
       - type: bind
         source: .
@@ -103,7 +103,7 @@ services:
       args:
         install_goose: "off"
         install_compile_deamon: "on"
-    command: bash -c '/rabbitmq.sh && /fluentd.sh && CompileDaemon -log-prefix=false -build="go build -o notification ./cmd/notification" -command="./notification" --graceful-kill=true -color=true'
+    command: bash -c '/rabbitmq.sh && /fluentd.sh && CompileDaemon -log-prefix=false -build="go build -race -o notification ./cmd/notification" -command="./notification" --graceful-kill=true -color=true'
     volumes:
       - type: bind
         source: .
