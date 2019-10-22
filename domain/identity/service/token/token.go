@@ -10,6 +10,7 @@ const (
 	TypeJWF = iota
 )
 
+//TODO: move JWT out of here and use as separate package. No need to make this directory structure so complex
 type (
 	Claims map[string]interface{}
 	// Tokener is a general interface that provides method for working

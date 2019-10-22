@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	types "github.com/Sharykhin/go-payments/core/type"
 	"github.com/Sharykhin/go-payments/domain/identity/repository/entity"
 )
 
@@ -12,5 +13,11 @@ type (
 	IdentityRepository interface {
 		CreatePassword(cxt context.Context, userID int64, password string) (*entity.UserPassword, error)
 		FindPasswordByUserID(cxt context.Context, userID int64) ([]entity.UserPassword, error)
+		Update(ctx context.Context, userID int64, fields UpdateFields) error
+	}
+
+	// UpdateFields represents fields that can be updated in term of Identity Domain
+	UpdateFields struct {
+		LastLogin types.NullTime
 	}
 )

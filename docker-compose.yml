@@ -109,6 +109,11 @@ services:
         source: .
         target: /app
     environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=root
+      - DATABASE_NAME=payments
       - RABBITMQ_USER=guest
       - RABBITMQ_PASS=guest
       - RABBITMQ_HOST=rabbitmq

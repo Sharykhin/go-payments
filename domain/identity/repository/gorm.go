@@ -7,6 +7,7 @@ import (
 	"github.com/jinzhu/gorm"
 
 	GORMDB "github.com/Sharykhin/go-payments/core/database/gorm"
+	types "github.com/Sharykhin/go-payments/core/type"
 	"github.com/Sharykhin/go-payments/domain/identity/repository/entity"
 )
 
@@ -40,6 +41,22 @@ func (r GORMRepository) FindPasswordByUserID(cxt context.Context, userID int64) 
 	}
 
 	return up, err
+}
+
+// Update is a general update methods that can update specified number of field abstracting
+// any knowledge of data source and its schema
+func (r GORMRepository) Update(ctx context.Context, userID int64, fields UpdateFields) error {
+	user := entity.User{
+		ID: userID,
+	}
+	r.conn.First(&user)
+
+	if fields.LastLogin.Valid {
+		user.LastLogin = types.NullTime{Valid: true, Time: fields.LastLogin.Time}
+	}
+	err := r.conn.Save(&user).Error
+
+	return err
 }
 
 // NewGORMRepository is a constructor function

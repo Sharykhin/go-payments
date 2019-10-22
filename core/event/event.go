@@ -22,6 +22,12 @@ type (
 	}
 	//Payload is a body payload of a queue message
 	Payload map[string]interface{}
+
+	// TODO: experiment not of using Payload map but interface of concrete payload for each event
+	UserLoginPayload struct {
+		UserID  int64
+		LoginAt time.Time
+	}
 )
 
 // NewEvent is a function construction to return

@@ -3,9 +3,10 @@ package rabbitmq
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Sharykhin/go-payments/core/deferrer"
 	"log"
 	"os"
+
+	"github.com/Sharykhin/go-payments/core/deferrer"
 
 	"github.com/streadway/amqp"
 
@@ -95,6 +96,7 @@ func init() {
 // that in scope of RabbitMQ will create a new queue.
 // This is done to allow multiple instances of the same service not to
 // get the same message.
+// TODO: think about using Subscribe not as method that creates goroutine but a sync one and run it in goroutine, or at least we should use context or channel to close goroutine
 func (q *Queue) Subscribe(tag, eventName string, fn func(e event.Event)) error {
 
 	if _, ok := q.events[eventName]; !ok {

@@ -18,6 +18,8 @@ func GeneratePassword(password string) (string, error) {
 	return string(hash), nil
 }
 
+// ComparePasswords compares two password, one as a plaint text and another one as hashed
+// and return an error is passwords do not match
 func ComparePasswords(pass, hash string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(pass))
 }

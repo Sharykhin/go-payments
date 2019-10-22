@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Sharykhin/go-payments/core"
+
 	"github.com/Sharykhin/go-payments/core/event"
 	"github.com/Sharykhin/go-payments/core/logger"
 	"github.com/Sharykhin/go-payments/core/queue"
@@ -31,6 +33,8 @@ type (
 	}
 )
 
+// NewAppUserAuth this is a function constructor
+// that returns a new instance of AppUserAuth struct
 func NewAppUserAuth() *AppUserAuth {
 	return &AppUserAuth{
 		userRetriever: service.NewAppUserRetriever(),
@@ -40,7 +44,17 @@ func NewAppUserAuth() *AppUserAuth {
 	}
 }
 
-func (s AppUserAuth) SingIn(ctx context.Context, req request.UserSignInRequest) (*userApplicationEntity.User, identityApplicationEntity.Token, error) {
+// SingIn signs user in by using general credentials such as email and password
+// It also generate JWT token.
+//TODO: just return JWT token it would be more semantic and obvious
+func (s AppUserAuth) SingIn(
+	ctx context.Context,
+	req request.UserSignInRequest,
+) (
+	*userApplicationEntity.User,
+	identityApplicationEntity.Token,
+	error,
+) {
 	au, err := s.userRetriever.FindUserByEmail(ctx, req.Email)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to find user by email: %v", err)
@@ -64,7 +78,8 @@ func (s AppUserAuth) SingIn(ctx context.Context, req request.UserSignInRequest) 
 
 func (s AppUserAuth) raiseSuccessSignInEvent(userID int64) {
 	err := s.dispatcher.RaiseEvent(event.NewEvent(event.UserSignIn, event.Payload{
-		"userID": userID,
+		"UserID":  userID,
+		"LoginAt": time.Now().UTC().Format(core.ISO8601),
 	}))
 	if err != nil {
 		logger.Log.Error("failed to raise event %s: %v", event.UserSignIn, err)
