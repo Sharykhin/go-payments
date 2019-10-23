@@ -19,6 +19,7 @@ type (
 	}
 )
 
+// TODO: it'e better to have function constructor along with main struct like it is done for repositories
 // NewUserIdentityService is a function constructor that returns
 // a new instance of AppUserIdentity struct
 func NewUserIdentityService() *AppUserIdentity {
