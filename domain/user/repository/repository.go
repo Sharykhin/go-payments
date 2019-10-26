@@ -12,5 +12,6 @@ type (
 	UserRepository interface {
 		Create(cxt context.Context, user entity.User) (*entity.User, error)
 		FindByEmail(ctx context.Context, email string) (*entity.User, error)
+		FindByID(ctx context.Context, ID int64) (*entity.User, error)
 	}
 )

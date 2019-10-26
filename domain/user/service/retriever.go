@@ -44,5 +44,18 @@ func (s AppUserRetriever) FindUserByEmail(ctx context.Context, email string) (*u
 }
 
 func (s AppUserRetriever) FindByID(ctx context.Context, ID int64) (*userApplicationEntity.User, error) {
-	return nil, nil
+	u, err := s.userRepository.FindByID(ctx, ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user from a repository: %v", err)
+	}
+
+	password, err := s.userIdentityService.FindUserPassword(ctx, u.ID)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to find user password: %v", err)
+	}
+
+	ua := userApplicationEntity.NewUserFromRepository(u, password)
+
+	return ua, nil
 }

@@ -55,3 +55,18 @@ func (r GORMRepository) FindByEmail(ctx context.Context, email string) (*entity.
 
 	return &user, nil
 }
+
+func (r GORMRepository) FindByID(ctx context.Context, ID int64) (*entity.User, error) {
+	user := entity.User{ID: ID}
+	err := r.conn.Where(&user).First(&user).Error
+
+	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, errors.ResourceNotFound
+		}
+		logger.Error("gorm could not execute select statement to find user by id: %v", err)
+		return nil, fmt.Errorf("repository failed to find user by id %s: %v", ID, err)
+	}
+
+	return &user, nil
+}

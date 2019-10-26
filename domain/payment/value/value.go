@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/shopspring/decimal"
 	"math/rand"
-	"time"
 )
 
 const (
@@ -42,9 +41,15 @@ func NewAmount(currency Currency, value decimal.Decimal) Amount {
 }
 
 func NewTransactionID() string {
-	return fmt.Sprintf("%v", rand.New(
-		rand.NewSource(time.Now().UnixNano()),
-	))
+	// TODO: move it out
+	var letter = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+	b := make([]rune, 20)
+	for i := range b {
+		b[i] = letter[rand.Intn(len(letter))]
+	}
+
+	return string(b)
 }
 
 func (s Status) String() string {

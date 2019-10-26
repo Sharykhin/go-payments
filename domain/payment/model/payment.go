@@ -57,7 +57,7 @@ func (p *Payment) MarshalJSON() ([]byte, error) {
 		Amount:      p.amount.Value.String(),
 		Description: p.description,
 		CreatedAt:   p.createdAt,
-		User: struct {
+		User: &struct {
 			ID    int64  `json:"ID"`
 			Email string `json:"Email"`
 		}{

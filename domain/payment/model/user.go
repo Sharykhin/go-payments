@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+
 	userApplicationEntity "github.com/Sharykhin/go-payments/domain/user/application/entity"
 	userService "github.com/Sharykhin/go-payments/domain/user/service"
 )
