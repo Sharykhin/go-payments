@@ -7,6 +7,7 @@ import (
 )
 
 type (
+	// TODO: do I really need to store Identity in the scope of User struct, looks like it is redundant
 	User struct {
 		ID        int64            `json:"ID"`
 		FirstName string           `json:"FirstName"`
