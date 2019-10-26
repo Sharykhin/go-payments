@@ -11,7 +11,15 @@ type (
 		PaymentCommander
 	}
 
+	PaymentRetriever interface {
+		all(cxt context.Context, criteria ...SearchCriteria) ([]model.Payment, error)
+	}
+
 	PaymentCommander interface {
 		Create(ctx context.Context, r request.NewPayment) (*model.Payment, error)
+	}
+
+	SearchCriteria interface {
+		ApplyCriteria()
 	}
 )
