@@ -13,7 +13,7 @@ type (
 		id          int64
 		amount      value.Amount
 		description string
-		user        User
+		user        UserInterface
 		createdAt   types.Time
 	}
 )
@@ -39,7 +39,7 @@ func (p *Payment) SetCreatedAt(date types.Time) *Payment {
 	return p
 }
 
-func (p *Payment) SetUser(user User) *Payment {
+func (p *Payment) SetUser(user UserInterface) *Payment {
 	p.user = user
 	return p
 }
@@ -47,14 +47,22 @@ func (p *Payment) SetUser(user User) *Payment {
 // MarshalJSON implements json.Marshaler interface
 func (p *Payment) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		ID          int64      `json:"ID"`
-		Amount      string     `json:"amount"`
-		Description string     `json:"description"`
-		CreatedAt   types.Time `json:"CreatedAt"`
+		ID          int64       `json:"ID"`
+		Amount      string      `json:"amount"`
+		Description string      `json:"description"`
+		CreatedAt   types.Time  `json:"CreatedAt"`
+		User        interface{} `json:"User"`
 	}{
 		ID:          p.id,
 		Amount:      p.amount.Value.String(),
 		Description: p.description,
 		CreatedAt:   p.createdAt,
+		User: struct {
+			ID    int64  `json:"ID"`
+			Email string `json:"Email"`
+		}{
+			ID:    p.user.GetID(),
+			Email: p.user.GetEmail(),
+		},
 	})
 }

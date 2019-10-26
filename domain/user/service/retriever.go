@@ -42,3 +42,7 @@ func (s AppUserRetriever) FindUserByEmail(ctx context.Context, email string) (*u
 
 	return ua, nil
 }
+
+func (s AppUserRetriever) FindByID(ctx context.Context, ID int64) (*userApplicationEntity.User, error) {
+	return nil, nil
+}

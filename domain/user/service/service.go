@@ -17,6 +17,7 @@ type (
 
 	UserRetriever interface {
 		FindUserByEmail(ctx context.Context, email string) (*userApplicationEntity.User, error)
+		FindByID(ctx context.Context, ID int64) (*userApplicationEntity.User, error)
 	}
 
 	UserCommander interface {

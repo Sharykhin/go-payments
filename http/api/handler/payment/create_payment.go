@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CreatePayment is a handler that services creating a new payment transaction endpoint
 func CreatePayment(c *gin.Context) {
 	var req pr.CreateTransactionRequest
 	if isValid, err := validation.ValidateRequest(c, &req); !isValid {

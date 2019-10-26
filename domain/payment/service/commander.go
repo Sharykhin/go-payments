@@ -48,7 +48,7 @@ func (a AppPaymentCommander) Create(ctx context.Context, r request.NewPayment) (
 		SetAmount(r.Amount).
 		SetDescription(r.Description).
 		SetCreatedAt(types.Time(time.Now().UTC())).
-		SetUser(model.User{ID: r.UserID})
+		SetUser(model.NewUserProxy(r.UserID))
 
 	return payment, nil
 }
