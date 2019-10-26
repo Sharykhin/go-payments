@@ -49,8 +49,8 @@ func AuthByToken() gin.HandlerFunc {
 
 		}
 		uc := identityEntity.UserContext{
-			ID:    int64(claims["id"].(float64)),
-			Roles: []identityEntity.Role{identityEntity.Role(claims["role"].(int64))},
+			ID: int64(claims["userID"].(float64)),
+			//Roles: []identityEntity.Role{identityEntity.Role(claims["role"].(int64))},
 		}
 
 		c.Set(httpApp.UserContext, uc)
