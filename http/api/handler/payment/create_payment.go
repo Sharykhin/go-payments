@@ -1,39 +1,38 @@
 package payment
 
 import (
-	"net/http"
-	"time"
+	"github.com/Sharykhin/go-payments/core/locator"
+	"github.com/Sharykhin/go-payments/domain/payment/request"
+	"github.com/Sharykhin/go-payments/domain/payment/value"
+	"github.com/Sharykhin/go-payments/http"
+	"github.com/Sharykhin/go-payments/http/validation"
 
-	"github.com/gin-gonic/gin"
-
-	"github.com/Sharykhin/go-payments/core/database"
-	"github.com/Sharykhin/go-payments/core/logger"
-	paymentEntity "github.com/Sharykhin/go-payments/domain/payment/repository/entity"
-	userEntity "github.com/Sharykhin/go-payments/domain/user/repository/entity"
 	"github.com/Sharykhin/go-payments/http/request/payment"
+	"github.com/gin-gonic/gin"
 )
 
 func CreatePayment(c *gin.Context) {
-	var r payment.CreateTransactionRequest
-	if err := c.ShouldBind(&r); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var req payment.CreateTransactionRequest
+	if isValid, err := validation.ValidateRequest(c, &req); !isValid {
+		http.BadRequest(c, http.Errors(err))
 		return
 	}
-	u := userEntity.User{ID: r.UserID}
-	database.G.Find(&u)
 
-	p := paymentEntity.Payment{
-		TransactionID: "123451223",
-		User:          u,
-		Status:        "Accepted",
-		Description:   r.Description,
-		Amount:        r.Amount,
-		ChargeDate:    time.Now().UTC(),
+	service := locator.GetPaymentService()
+
+	p, err := service.Create(c.Request.Context(), request.NewPayment{
+		Amount:      value.NewAmount(value.USD, req.Amount),
+		Description: req.Description,
+		UserID:      req.UserID,
+	})
+
+	if err != nil {
+		http.BadRequest(c, http.Errors{err.Error()})
+		return
 	}
 
-	logger.Log.Info("Payment Before: %v", p)
-	database.G.Save(&p)
-	logger.Log.Info("Payment After: %v", p)
-	c.JSON(http.StatusCreated, gin.H{"payment": p})
+	http.Created(c, http.Data{
+		"Payment": p,
+	}, nil)
 
 }

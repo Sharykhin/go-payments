@@ -3,6 +3,7 @@ package locator
 import (
 	"github.com/Sharykhin/go-payments/core/queue"
 	identityService "github.com/Sharykhin/go-payments/domain/identity/service/identity"
+	paymentService "github.com/Sharykhin/go-payments/domain/payment/service"
 	"github.com/Sharykhin/go-payments/domain/user/auth"
 	userService "github.com/Sharykhin/go-payments/domain/user/service"
 )
@@ -69,6 +70,21 @@ func GetUserRetrieverService() userService.UserRetriever {
 	}
 	inst := userService.NewAppUserRetriever()
 	instances["UserRetriever"] = inst
+
+	return inst
+}
+
+func GetPaymentService() paymentService.PaymentService {
+	if _, ok := instances["PaymentService"]; ok {
+		return instances["PaymentService"].(paymentService.PaymentService)
+	}
+	inst := struct {
+		paymentService.PaymentService
+	}{
+		paymentService.NewAppPaymentCommander(),
+	}
+
+	instances["PaymentService"] = inst
 
 	return inst
 }
