@@ -40,6 +40,11 @@ func BadRequest(c *gin.Context, errors Errors) {
 	c.JSON(httpCodes.StatusBadRequest, response)
 }
 
+func ServerError(c *gin.Context, errors Errors) {
+	response := newResponse(httpCodes.StatusInternalServerError, nil, nil, errors)
+	c.JSON(httpCodes.StatusInternalServerError, response)
+}
+
 func newResponse(code int, data Data, meta Meta, errors Errors) Response {
 	if meta == nil {
 		meta = Meta{}

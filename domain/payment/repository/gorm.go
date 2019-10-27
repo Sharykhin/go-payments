@@ -17,6 +17,14 @@ type (
 	}
 )
 
+// NewGORMRepository is a constructor function that returns a new instance of GORMRepository
+// and satisfies PaymentRepository interface
+func NewGORMRepository() *GORMRepository {
+	return &GORMRepository{
+		conn: GORMDB.G,
+	}
+}
+
 // Create creates a new payment record in a database and returns just created record
 func (r GORMRepository) Create(cxt context.Context, payment Payment) (*Payment, error) {
 	err := r.conn.Create(&payment).Error
@@ -27,10 +35,13 @@ func (r GORMRepository) Create(cxt context.Context, payment Payment) (*Payment, 
 	return &payment, nil
 }
 
-// NewGORMRepository is a constructor function that returns a new instance of GORMRepository
-// and satisfies PaymentRepository interface
-func NewGORMRepository() *GORMRepository {
-	return &GORMRepository{
-		conn: GORMDB.G,
+func (r GORMRepository) List(ctx context.Context, criteria ...Criteria) ([]Payment, int64, error) {
+	var p []Payment
+
+	err := r.conn.Order("created_at desc").Limit(10).Find(&p).Error
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to execute select statement to return a list of payments: %v", err)
 	}
+
+	return p, int64(len(p)), nil
 }

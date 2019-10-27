@@ -2,8 +2,11 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"github.com/Sharykhin/go-payments/core/type"
 	"github.com/Sharykhin/go-payments/domain/payment/model"
 	"github.com/Sharykhin/go-payments/domain/payment/repository"
+	"github.com/Sharykhin/go-payments/domain/payment/value"
 )
 
 type (
@@ -12,6 +15,31 @@ type (
 	}
 )
 
-func (a AppPaymentRetriever) all(cxt context.Context, criteria ...SearchCriteria) ([]model.Payment, error) {
-	return nil, nil
+func NewAppPaymentRetriever() *AppPaymentRetriever {
+	return &AppPaymentRetriever{
+		repository: repository.NewGORMRepository(),
+	}
+}
+
+func (a AppPaymentRetriever) All(ctx context.Context, criteria ...SearchCriteria) ([]model.Payment, error) {
+	ps, _, err := a.repository.List(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not find list of payments: %v", err)
+	}
+
+	var pp []model.Payment
+	// TODO: UserProxy works as lazy loading but what about eager loader
+	for _, payment := range ps {
+		pp = append(
+			pp,
+			*new(model.Payment).
+				SetID(payment.ID).
+				SetDescription(payment.Description).
+				SetCreatedAt(types.Time(payment.ChargeDate)).
+				SetAmount(value.NewAmount(value.USD, payment.Amount)).
+				SetUser(model.NewUserProxy(payment.UserID)),
+		)
+	}
+
+	return pp, nil
 }

@@ -9,10 +9,11 @@ import (
 type (
 	PaymentService interface {
 		PaymentCommander
+		PaymentRetriever
 	}
 
 	PaymentRetriever interface {
-		all(cxt context.Context, criteria ...SearchCriteria) ([]model.Payment, error)
+		All(cxt context.Context, criteria ...SearchCriteria) ([]model.Payment, error)
 	}
 
 	PaymentCommander interface {

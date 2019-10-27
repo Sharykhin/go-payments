@@ -1,31 +1,27 @@
 package payment
 
 import (
-	"fmt"
-	"net/http"
-	"strconv"
-
+	"github.com/Sharykhin/go-payments/domain/payment/model"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 
-	"github.com/Sharykhin/go-payments/core/database"
-	userEntity "github.com/Sharykhin/go-payments/domain/user/repository/entity"
+	"github.com/Sharykhin/go-payments/core/locator"
+	"github.com/Sharykhin/go-payments/http"
 )
 
 func GetUserPayments(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
+	service := locator.GetPaymentService()
+	payments, err := service.All(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		http.ServerError(c, http.Errors{err.Error()})
 		return
 	}
 
-	user := userEntity.User{
-		ID: int64(id),
+	var vm []model.PaymentView
+	for _, p := range payments {
+		vm = append(vm, model.NewPaymentViewModel(p, "list"))
 	}
 
-	database.G.Preload("Payments", func(db *gorm.DB) *gorm.DB {
-		return db.Order("created_at DESC")
-	}).Find(&user)
-	fmt.Println("User", user)
-	c.JSON(http.StatusOK, gin.H{"payments": user.Payments})
+	http.OK(c, map[string]interface{}{
+		"Payments": vm,
+	}, nil)
 }

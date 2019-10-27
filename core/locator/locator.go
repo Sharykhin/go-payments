@@ -74,14 +74,18 @@ func GetUserRetrieverService() userService.UserRetriever {
 	return inst
 }
 
+// GetPaymentService returns an instance of payment service
+// that includes either as mutator as retriever.
 func GetPaymentService() paymentService.PaymentService {
 	if _, ok := instances["PaymentService"]; ok {
 		return instances["PaymentService"].(paymentService.PaymentService)
 	}
 	inst := struct {
-		paymentService.PaymentService
+		paymentService.PaymentCommander
+		paymentService.PaymentRetriever
 	}{
 		paymentService.NewAppPaymentCommander(),
+		paymentService.NewAppPaymentRetriever(),
 	}
 
 	instances["PaymentService"] = inst

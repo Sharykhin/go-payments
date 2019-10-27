@@ -16,11 +16,27 @@ type (
 		user        UserInterface
 		createdAt   types.Time
 	}
+
+	PaymentView struct {
+		ID        int64      `json:"ID"`
+		Amount    string     `json:"Amount"`
+		CreatedAt types.Time `json:"CreatedAt"`
+		User      *UserView  `json:"User,omitempty"`
+	}
+
+	UserView struct {
+		ID    int64  `json:"ID"`
+		Email string `json:"Email"`
+	}
 )
 
 func (p *Payment) SetID(ID int64) *Payment {
 	p.id = ID
 	return p
+}
+
+func (p *Payment) GetID() int64 {
+	return p.id
 }
 
 func (p *Payment) SetAmount(amount value.Amount) *Payment {
@@ -65,4 +81,36 @@ func (p *Payment) MarshalJSON() ([]byte, error) {
 			Email: p.user.GetEmail(),
 		},
 	})
+}
+
+func (p *Payment) ViewModel() ([]byte, error) {
+	return json.Marshal(struct {
+		ID          int64      `json:"ID"`
+		Amount      string     `json:"amount"`
+		Description string     `json:"description"`
+		CreatedAt   types.Time `json:"CreatedAt"`
+	}{
+		ID:          p.id,
+		Amount:      p.amount.Value.String(),
+		Description: p.description,
+		CreatedAt:   p.createdAt,
+	})
+}
+
+func NewPaymentViewModel(p Payment, view string) PaymentView {
+	vm := PaymentView{
+		ID:        p.GetID(),
+		Amount:    p.amount.Value.String(),
+		CreatedAt: p.createdAt,
+	}
+
+	if view == "list" {
+		return vm
+	}
+
+	vm.User = &UserView{
+		ID:    p.user.GetID(),
+		Email: p.user.GetEmail(),
+	}
+	return vm
 }
