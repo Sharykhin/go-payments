@@ -40,6 +40,11 @@ func BadRequest(c *gin.Context, errors Errors) {
 	c.JSON(httpCodes.StatusBadRequest, response)
 }
 
+func Forbidden(c *gin.Context) {
+	response := newResponse(httpCodes.StatusForbidden, nil, nil, Errors{"this action is forbidden"})
+	c.JSON(httpCodes.StatusBadRequest, response)
+}
+
 func ServerError(c *gin.Context, errors Errors) {
 	response := newResponse(httpCodes.StatusInternalServerError, nil, nil, errors)
 	c.JSON(httpCodes.StatusInternalServerError, response)

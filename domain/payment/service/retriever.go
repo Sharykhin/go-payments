@@ -3,8 +3,10 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/Sharykhin/go-payments/core/type"
+
+	types "github.com/Sharykhin/go-payments/core/type"
 	"github.com/Sharykhin/go-payments/domain/payment/model"
+	"github.com/Sharykhin/go-payments/domain/payment/proxy"
 	"github.com/Sharykhin/go-payments/domain/payment/repository"
 	"github.com/Sharykhin/go-payments/domain/payment/value"
 )
@@ -37,7 +39,7 @@ func (a AppPaymentRetriever) All(ctx context.Context, criteria ...SearchCriteria
 				SetDescription(payment.Description).
 				SetCreatedAt(types.Time(payment.ChargeDate)).
 				SetAmount(value.NewAmount(value.USD, payment.Amount)).
-				SetUser(model.NewUserProxy(payment.UserID)),
+				SetUser(proxy.NewUserProxy(payment.UserID)),
 		)
 	}
 

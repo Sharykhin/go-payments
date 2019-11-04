@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Sharykhin/go-payments/domain/payment/proxy"
+
 	"github.com/Sharykhin/go-payments/core/queue"
-	"github.com/Sharykhin/go-payments/core/type"
+	types "github.com/Sharykhin/go-payments/core/type"
 	"github.com/Sharykhin/go-payments/domain/payment/model"
 	"github.com/Sharykhin/go-payments/domain/payment/repository"
 	"github.com/Sharykhin/go-payments/domain/payment/request"
@@ -49,7 +51,7 @@ func (a AppPaymentCommander) Create(ctx context.Context, r request.NewPayment) (
 		SetAmount(r.Amount).
 		SetDescription(r.Description).
 		SetCreatedAt(types.Time(time.Now().UTC())).
-		SetUser(model.NewUserProxy(r.UserID))
+		SetUser(proxy.NewUserProxy(r.UserID))
 
 	return payment, nil
 }

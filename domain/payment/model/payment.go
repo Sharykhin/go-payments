@@ -3,7 +3,7 @@ package model
 import (
 	"encoding/json"
 
-	"github.com/Sharykhin/go-payments/core/type"
+	types "github.com/Sharykhin/go-payments/core/type"
 	"github.com/Sharykhin/go-payments/domain/payment/value"
 )
 
@@ -17,13 +17,17 @@ type (
 		createdAt   types.Time
 	}
 
+	// PaymentView represents how payment transaction
+	// should be serialized in json
 	PaymentView struct {
-		ID        int64      `json:"ID"`
-		Amount    string     `json:"Amount"`
-		CreatedAt types.Time `json:"CreatedAt"`
-		User      *UserView  `json:"User,omitempty"`
+		ID          int64      `json:"ID"`
+		Amount      string     `json:"Amount"`
+		Description string     `json:"Description"`
+		User        *UserView  `json:"User,omitempty"`
+		CreatedAt   types.Time `json:"CreatedAt"`
 	}
 
+	// UserView represents user in a payment context
 	UserView struct {
 		ID    int64  `json:"ID"`
 		Email string `json:"Email"`
@@ -99,9 +103,10 @@ func (p *Payment) ViewModel() ([]byte, error) {
 
 func NewPaymentViewModel(p Payment, view string) PaymentView {
 	vm := PaymentView{
-		ID:        p.GetID(),
-		Amount:    p.amount.Value.String(),
-		CreatedAt: p.createdAt,
+		ID:          p.GetID(),
+		Amount:      p.amount.Value.String(),
+		CreatedAt:   p.createdAt,
+		Description: p.description,
 	}
 
 	if view == "list" {

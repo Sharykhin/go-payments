@@ -29,7 +29,7 @@ func ListenAndServe() error {
 	{
 		auth.Use(middleware.AuthByToken())
 		auth.GET("/users/:id/payments", handlerPayment.GetUserPayments)
-		auth.POST("/payments", handlerPayment.CreatePayment)
+		auth.POST("/users/:id/payments", handlerPayment.CreatePayment)
 	}
 
 	return r.Run(os.Getenv("API_ADDR"))
