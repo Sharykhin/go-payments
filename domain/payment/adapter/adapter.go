@@ -8,10 +8,11 @@ import (
 )
 
 type (
+	// UserAdapter transform user domain model into payment context representation
 	UserAdapter interface {
 		GetUser(ctx context.Context, userID int64) (model.UserInterface, error)
 	}
-
+	// TODO: semantically it's not correct it should be concrete UserAdapter implementation
 	PaymentAdapter struct {
 		userService service.UserRetriever
 	}

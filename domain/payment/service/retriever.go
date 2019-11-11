@@ -24,7 +24,7 @@ func NewAppPaymentRetriever() *AppPaymentRetriever {
 }
 
 func (a AppPaymentRetriever) All(ctx context.Context, criteria ...SearchCriteria) ([]model.Payment, error) {
-	ps, _, err := a.repository.List(ctx)
+	ps, err := a.repository.List(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("could not find list of payments: %v", err)
 	}

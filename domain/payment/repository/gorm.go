@@ -35,13 +35,14 @@ func (r GORMRepository) Create(cxt context.Context, payment Payment) (*Payment, 
 	return &payment, nil
 }
 
-func (r GORMRepository) List(ctx context.Context, criteria ...Criteria) ([]Payment, int64, error) {
+// List returns some amount of rows
+func (r GORMRepository) List(ctx context.Context, criteria ...Criteria) ([]Payment, error) {
 	var p []Payment
 
 	err := r.conn.Order("created_at desc").Limit(10).Find(&p).Error
 	if err != nil {
-		return nil, 0, fmt.Errorf("failed to execute select statement to return a list of payments: %v", err)
+		return nil, fmt.Errorf("failed to execute select statement to return a list of payments: %v", err)
 	}
 
-	return p, int64(len(p)), nil
+	return p, nil
 }

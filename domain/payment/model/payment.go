@@ -16,7 +16,7 @@ type (
 		user        UserInterface
 		createdAt   types.Time
 	}
-
+	// TODO: payment view doesn't look reallly handy, think about how it should be changed if that possible
 	// PaymentView represents how payment transaction
 	// should be serialized in json
 	PaymentView struct {

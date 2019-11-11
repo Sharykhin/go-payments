@@ -2,11 +2,14 @@ package service
 
 import (
 	"context"
+
 	"github.com/Sharykhin/go-payments/domain/payment/model"
 	"github.com/Sharykhin/go-payments/domain/payment/request"
 )
 
 type (
+	// PaymentService is a general interface that payment domain provides for
+	// outer context to use
 	PaymentService interface {
 		PaymentCommander
 		PaymentRetriever
