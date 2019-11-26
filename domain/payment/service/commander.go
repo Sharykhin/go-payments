@@ -30,6 +30,7 @@ func NewAppPaymentCommander() *AppPaymentCommander {
 	}
 }
 
+// Create creates a new payment model
 func (a AppPaymentCommander) Create(ctx context.Context, r request.NewPayment) (*model.Payment, error) {
 
 	p, err := a.repository.Create(ctx, repository.Payment{
@@ -45,13 +46,13 @@ func (a AppPaymentCommander) Create(ctx context.Context, r request.NewPayment) (
 		return nil, fmt.Errorf("failed to create a new payment")
 	}
 
-	payment := new(model.Payment)
-	payment.
-		SetID(p.ID).
-		SetAmount(r.Amount).
-		SetDescription(r.Description).
-		SetCreatedAt(types.Time(time.Now().UTC())).
-		SetUser(proxy.NewUserProxy(r.UserID))
+	payment := model.NewPayment(
+		p.ID,
+		r.Amount,
+		r.Description,
+		types.Time(time.Now().UTC()),
+		proxy.NewUserProxy(r.UserID),
+	)
 
 	return payment, nil
 }

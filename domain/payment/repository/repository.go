@@ -4,6 +4,10 @@ import (
 	"context"
 )
 
+const (
+	LimitCriteriaName = "LimitCriteria"
+)
+
 type (
 	// Repository provides all the methods to works with a storage layer
 	PaymentRepository interface {
@@ -12,5 +16,15 @@ type (
 	}
 
 	Criteria interface {
+		Name() string
+	}
+
+	LimitCriteria struct {
+		Offset int64
+		Limit  int64
 	}
 )
+
+func (c LimitCriteria) Name() string {
+	return LimitCriteriaName
+}

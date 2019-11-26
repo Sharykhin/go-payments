@@ -35,6 +35,11 @@ func Created(c *gin.Context, data Data, meta Meta) {
 	c.JSON(httpCodes.StatusCreated, response)
 }
 
+func Unauthorized(c *gin.Context, errors Errors) {
+	response := newResponse(httpCodes.StatusUnauthorized, nil, nil, errors)
+	c.JSON(httpCodes.StatusUnauthorized, response)
+}
+
 func BadRequest(c *gin.Context, errors Errors) {
 	response := newResponse(httpCodes.StatusBadRequest, nil, nil, errors)
 	c.JSON(httpCodes.StatusBadRequest, response)

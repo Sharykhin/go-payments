@@ -33,6 +33,6 @@ func NewUserProxy(ID int64) *UserProxy {
 	return &UserProxy{
 		id:          ID,
 		user:        nil,
-		userAdapter: adapter.NewPaymentAdapter(),
+		userAdapter: adapter.NewUserAdapter(),
 	}
 }

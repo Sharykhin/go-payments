@@ -16,7 +16,7 @@ type (
 	}
 
 	PaymentRetriever interface {
-		All(cxt context.Context, criteria ...SearchCriteria) ([]model.Payment, error)
+		LimitedList(cxt context.Context, offset, limit int64) ([]model.Payment, error)
 	}
 
 	PaymentCommander interface {

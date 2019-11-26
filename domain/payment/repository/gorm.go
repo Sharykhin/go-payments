@@ -35,11 +35,22 @@ func (r GORMRepository) Create(cxt context.Context, payment Payment) (*Payment, 
 	return &payment, nil
 }
 
-// List returns some amount of rows
+// List returns list of payments rows
+// Can accept various of criteria, such as limit criteria and etc.
 func (r GORMRepository) List(ctx context.Context, criteria ...Criteria) ([]Payment, error) {
 	var p []Payment
+	builder := r.conn.Order("created_at desc")
 
-	err := r.conn.Order("created_at desc").Limit(10).Find(&p).Error
+	for _, criteriaItem := range criteria {
+		if criteriaItem.Name() == LimitCriteriaName {
+			limitCriteria := criteriaItem.(LimitCriteria)
+
+			builder.Offset(limitCriteria.Offset)
+			builder.Limit(limitCriteria.Limit)
+		}
+	}
+
+	err := builder.Find(&p).Error
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute select statement to return a list of payments: %v", err)
 	}
