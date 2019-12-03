@@ -15,16 +15,20 @@ type (
 		List(ctx context.Context, criteria ...Criteria) ([]Payment, error)
 	}
 
+	// Criteria describes general conditional criteria
+	// that can be applied to a repository
 	Criteria interface {
 		Name() string
 	}
 
+	// LimitCriteria apply condition to return a limited number of records
 	LimitCriteria struct {
 		Offset int64
 		Limit  int64
 	}
 )
 
+// Name returns criteria name
 func (c LimitCriteria) Name() string {
 	return LimitCriteriaName
 }

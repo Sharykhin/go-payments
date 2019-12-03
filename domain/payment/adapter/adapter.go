@@ -18,8 +18,6 @@ type (
 	}
 )
 
-var userAdapter = service.NewUserService()
-
 // NewUserAdapter returns a concrete implementation of UserAdapter
 func NewUserAdapter() DefaultUserAdapter {
 	return DefaultUserAdapter{
@@ -29,15 +27,6 @@ func NewUserAdapter() DefaultUserAdapter {
 
 func (a DefaultUserAdapter) GetUser(ctx context.Context, userID int64) (model.UserInterface, error) {
 	user, err := a.userService.FindByID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-
-	return model.NewUser(user.ID, user.Email), nil
-}
-
-func GetUser(ctx context.Context, userID int64) (model.UserInterface, error) {
-	user, err := userAdapter.FindByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
