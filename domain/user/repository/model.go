@@ -1,13 +1,13 @@
-package entity
+package repository
 
 import (
 	"time"
 
 	types "github.com/Sharykhin/go-payments/core/type"
-	//"github.com/Sharykhin/go-payments/domain/payment/repository/entity"
 )
 
 type (
+	// User describe user model on repository level
 	User struct {
 		ID        int64 `gorm:"primary_key"`
 		FirstName string
@@ -19,22 +19,8 @@ type (
 		Payments []Payment `gorm:"PRELOAD:true;foreignkey:UserID" json:"-"`
 	}
 
+	// Payment describes payment model on repository level in the context of user domain
 	Payment struct {
 		TransactionID string
 	}
 )
-
-// NewUser creates a new repository user entity
-func NewUser(firstName, lastName, email string) User {
-	return User{
-		FirstName: firstName,
-		LastName: types.NullString{
-			Valid:  lastName != "",
-			String: lastName,
-		},
-		Email: email,
-		DeletedAt: types.NullTime{
-			Valid: false,
-		},
-	}
-}

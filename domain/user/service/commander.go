@@ -11,7 +11,6 @@ import (
 	userApplicationEntity "github.com/Sharykhin/go-payments/domain/user/application/entity"
 	"github.com/Sharykhin/go-payments/domain/user/application/request"
 	"github.com/Sharykhin/go-payments/domain/user/repository"
-	userRepositoryEntity "github.com/Sharykhin/go-payments/domain/user/repository/entity"
 )
 
 type (
@@ -35,7 +34,11 @@ func NewAppUserCommander() *AppUserCommander {
 func (s AppUserCommander) Create(ctx context.Context, req request.UserCreateRequest) (*userApplicationEntity.User, error) {
 	user := userRepositoryEntity.NewUser(req.FirstName, req.LastName.String, req.Email)
 
-	newUser, err := s.userRepository.Create(ctx, user)
+	newUser, err := s.userRepository.Create(ctx, repository.User{
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+		Email:     req.Email,
+	})
 
 	if err != nil {
 		return nil, fmt.Errorf("could not create a new user: %v", err)
