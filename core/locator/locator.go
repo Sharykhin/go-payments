@@ -1,7 +1,10 @@
 package locator
 
 import (
+	"github.com/Sharykhin/go-payments/core/logger"
 	"github.com/Sharykhin/go-payments/core/queue"
+	"github.com/Sharykhin/go-payments/core/queue/rabbitmq"
+	identityRepository "github.com/Sharykhin/go-payments/domain/identity/repository"
 	identityService "github.com/Sharykhin/go-payments/domain/identity/service/identity"
 	paymentService "github.com/Sharykhin/go-payments/domain/payment/service"
 	"github.com/Sharykhin/go-payments/domain/user/auth"
@@ -39,7 +42,12 @@ func GetIdentityService() identityService.UserIdentity {
 	if _, ok := instances["UserIdentity"]; ok {
 		return instances["UserIdentity"].(identityService.UserIdentity)
 	}
-	inst := identityService.NewUserIdentityService()
+
+	inst := identityService.NewIdentityService(
+		identityRepository.NewGORMRepository(),
+		logger.Log,
+		rabbitmq.NewQueue(),
+	)
 	instances["UserIdentity"] = inst
 	return inst
 }
