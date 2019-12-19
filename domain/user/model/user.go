@@ -26,6 +26,18 @@ func (u *User) GetPayments() []Payment {
 	return nil
 }
 
+func (u User) GetID() int64 {
+	return u.id
+}
+
+func (u User) GetEmail() string {
+	return u.email
+}
+
+func (u User) GetIdentity() Identity {
+	return u.identity
+}
+
 func NewUser(id int64, firstName, email string, lastName types.NullString, identity Identity) *User {
 	return &User{
 		id:        id,

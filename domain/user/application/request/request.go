@@ -6,6 +6,7 @@ import (
 )
 
 type (
+	// TODO: move rquestss to apporiate packages causse they must be aware of incomint request and no depend on a separate package you bastard!
 	// UserCreateRequest represents all the necessary data that should be used for creating a new user.
 	// It also accepts a role
 	UserCreateRequest struct {

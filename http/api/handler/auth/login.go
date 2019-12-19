@@ -32,7 +32,7 @@ func Login(c *gin.Context, auth auth.UserAuth) {
 		http.BadRequest(c, http.Errors{errors.CredentialsDoNotMatch.Error()})
 		return
 	}
-	logger.Info("user ID %d successfully signed in: %v", user.ID)
+	logger.Info("user ID %d successfully signed in: %v", user.GetID())
 	http.OK(c, http.Data{
 		"User":  user,
 		"Token": token,

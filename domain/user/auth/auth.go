@@ -13,15 +13,15 @@ import (
 	identityApplicationEntity "github.com/Sharykhin/go-payments/domain/identity/application/entity"
 	"github.com/Sharykhin/go-payments/domain/identity/service/identity"
 	"github.com/Sharykhin/go-payments/domain/identity/service/token"
-	userApplicationEntity "github.com/Sharykhin/go-payments/domain/user/application/entity"
 	"github.com/Sharykhin/go-payments/domain/user/application/request"
+	userModel "github.com/Sharykhin/go-payments/domain/user/model"
 	"github.com/Sharykhin/go-payments/domain/user/service"
 )
 
 type (
 	// UserAuth provides API for authentication and authorization purposes
 	UserAuth interface {
-		SingIn(ctx context.Context, req request.UserSignInRequest) (*userApplicationEntity.User, identityApplicationEntity.Token, error)
+		SingIn(ctx context.Context, req request.UserSignInRequest) (*userModel.User, identityApplicationEntity.Token, error)
 	}
 
 	// AppUserAuth is a concrete implementation of UserAuth interface
@@ -30,6 +30,11 @@ type (
 		userIdentity  identity.UserIdentity
 		token         token.Tokener
 		dispatcher    queue.Publisher
+	}
+
+	UserSignInRequest struct {
+		Email    string
+		Password string
 	}
 )
 
@@ -65,29 +70,30 @@ func (s AppUserAuth) SingIn(
 	ctx context.Context,
 	req request.UserSignInRequest,
 ) (
-	*userApplicationEntity.User,
+	*userModel.User,
 	identityApplicationEntity.Token,
 	error,
 ) {
-	au, err := s.userRetriever.FindUserByEmail(ctx, req.Email)
+	user, err := s.userRetriever.FindUserByEmail(ctx, req.Email)
 	if err != nil {
+		// TODO: replace by NotFoundError
 		return nil, "", fmt.Errorf("failed to find user by email: %v", err)
 	}
-
-	if isValid, err := s.userIdentity.ValidatePassword(ctx, au.Identity.Password, req.Password); !isValid {
+	// TODO: replace by IncorrectPasssword or to use errors.Is add create new error method
+	if isValid, err := s.userIdentity.ValidatePassword(ctx, user.GetIdentity().Password, req.Password); !isValid {
 		return nil, "", fmt.Errorf("failed to validate password: %v", err)
 	}
 
 	tokenStr, err := s.token.Generate(map[string]interface{}{
-		"userID": au.ID,
+		"userID": user.GetID(),
 	}, time.Duration(1*time.Hour))
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to generate token: %v", err)
 	}
 
-	s.raiseSuccessSignInEvent(au.ID)
+	s.raiseSuccessSignInEvent(user.GetID())
 
-	return au, identityApplicationEntity.Token(tokenStr), nil
+	return user, identityApplicationEntity.Token(tokenStr), nil
 }
 
 func (s AppUserAuth) raiseSuccessSignInEvent(userID int64) {

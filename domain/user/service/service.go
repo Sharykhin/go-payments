@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	userApplicationEntity "github.com/Sharykhin/go-payments/domain/user/application/entity"
 	"github.com/Sharykhin/go-payments/domain/user/application/request"
+	userrModel "github.com/Sharykhin/go-payments/domain/user/model"
 )
 
 type (
@@ -16,12 +16,12 @@ type (
 	}
 
 	UserRetriever interface {
-		FindUserByEmail(ctx context.Context, email string) (*userApplicationEntity.User, error)
-		FindByID(ctx context.Context, ID int64) (*userApplicationEntity.User, error)
+		FindUserByEmail(ctx context.Context, email string) (*userrModel.User, error)
+		FindByID(ctx context.Context, ID int64) (*userrModel.User, error)
 	}
 
 	UserCommander interface {
-		Create(ctx context.Context, req request.UserCreateRequest) (*userApplicationEntity.User, error)
+		Create(ctx context.Context, req request.UserCreateRequest) (*userrModel.User, error)
 	}
 
 	// AppUserService is a main instance that would satisfy UserService interface

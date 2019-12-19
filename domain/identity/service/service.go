@@ -6,6 +6,7 @@ import (
 )
 
 type (
+	// TODO: maybe it's better to have some sort of PasswordService?
 	// UserIdentifier interface provides methods around user identity
 	// like password and also tracks last login
 	UserIdentifier interface {
@@ -14,6 +15,9 @@ type (
 		ValidatePassword(ctx context.Context, password string, compare string) (bool, error)
 		UpdateLastLogin(ctx context.Context, userID int64, lastLogin time.Time) error
 	}
+
+	//TODO:
+	// I have concerns regarding UpdateLastLogin method
 
 	// Tokener is a general interface that provides method for working
 	// with identification through the token string. Providers can be different, like

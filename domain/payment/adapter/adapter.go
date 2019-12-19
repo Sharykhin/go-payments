@@ -31,5 +31,5 @@ func (a DefaultUserAdapter) GetUser(ctx context.Context, userID int64) (model.Us
 		return nil, err
 	}
 
-	return model.NewUser(user.ID, user.Email), nil
+	return model.NewUser(user.GetID(), user.GetEmail()), nil
 }

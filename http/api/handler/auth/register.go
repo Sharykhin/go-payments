@@ -37,7 +37,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	raiseSuccessfulRegistration(user.ID)
+	raiseSuccessfulRegistration(user.GetID())
 
 	http.Created(c, http.Data{
 		"User": user,
