@@ -33,6 +33,20 @@ type (
 	}
 )
 
+func NewUserAuth(
+	userRetriever service.UserRetriever,
+	userIdentitier identity.UserIdentity,
+	tokener token.Tokener,
+	dispatcher queue.Publisher,
+) UserAuth {
+	return &AppUserAuth{
+		userRetriever: userRetriever,
+		userIdentity:  userIdentitier,
+		token:         tokener,
+		dispatcher:    dispatcher,
+	}
+}
+
 // NewAppUserAuth this is a function constructor
 // that returns a new instance of AppUserAuth struct
 func NewAppUserAuth() *AppUserAuth {

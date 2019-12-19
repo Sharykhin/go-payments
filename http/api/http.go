@@ -3,6 +3,12 @@ package api
 import (
 	"os"
 
+	"github.com/Sharykhin/go-payments/core/queue/rabbitmq"
+	"github.com/Sharykhin/go-payments/domain/identity/service/identity"
+	"github.com/Sharykhin/go-payments/domain/identity/service/token"
+	"github.com/Sharykhin/go-payments/domain/user/auth"
+	"github.com/Sharykhin/go-payments/domain/user/service"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
@@ -22,7 +28,15 @@ func ListenAndServe() error {
 	{
 		v1.GET("/ping", handler.Ping)
 		v1.POST("/register", handlerAuth.Register)
-		v1.POST("/login", handlerAuth.Login)
+		v1.POST("/login", func(c *gin.Context) {
+
+			handlerAuth.Login(c, auth.NewUserAuth(
+				service.NewAppUserRetriever(),
+				identity.NewUserIdentityService(),
+				token.NewTokenService(token.TypeJWF),
+				rabbitmq.NewQueue(),
+			))
+		})
 	}
 
 	auth := v1.Group("/")

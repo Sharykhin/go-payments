@@ -5,7 +5,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"github.com/Sharykhin/go-payments/domain/user/repository/entity"
+	"github.com/Sharykhin/go-payments/domain/user/repository"
 )
 
 type (
@@ -13,7 +13,7 @@ type (
 	Payment struct {
 		ID            int64           `gorm:"primary_key"`
 		TransactionID string          `gorm:"column:transaction_id"`
-		User          entity.User     `gorm:"association_autoupdate:false" json:"-" `
+		User          repository.User `gorm:"association_autoupdate:false" json:"-" `
 		UserID        int64           `gorm:"column:user_id"`
 		Amount        decimal.Decimal `gorm:"column:amount"`
 		Description   string          `gorm:"column:description"`

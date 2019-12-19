@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Sharykhin/go-payments/domain/user/model"
-
 	"github.com/Sharykhin/go-payments/core/event"
 	"github.com/Sharykhin/go-payments/core/logger"
 	"github.com/Sharykhin/go-payments/core/queue"
@@ -53,7 +51,7 @@ func (s AppUserCommander) Create(ctx context.Context, req request.UserCreateRequ
 
 	appUser := userApplicationEntity.NewUserFromRepository(userEntity, pass)
 
-	userModel := model.User{}
+	//userModel := model.User{}
 
 	s.raiseUserSuccessCreation(userEntity.ID)
 

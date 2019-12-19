@@ -10,6 +10,8 @@ const (
 	TypeJWF = iota
 )
 
+//TODO: do not be crazy about abstractions create just jwt package and simplify it
+
 //TODO: move JWT out of here and use as separate package. No need to make this directory structure so complex
 type (
 	Claims map[string]interface{}

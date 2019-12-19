@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"github.com/Sharykhin/go-payments/domain/user/repository/entity"
+	"github.com/Sharykhin/go-payments/domain/user/repository"
 
 	types "github.com/Sharykhin/go-payments/core/type"
 )
@@ -29,7 +29,7 @@ func (u *User) GetPayments() []Payment {
 
 // NewUserFromRepository creates a new application user model
 // based on one that repository returned. It also requires a password
-func NewUserFromRepository(user *entity.User, pass string) *User {
+func NewUserFromRepository(user *repository.User, pass string) *User {
 	return &User{
 		ID:        user.ID,
 		FirstName: user.FirstName,
