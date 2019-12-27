@@ -1,11 +1,13 @@
 package locator
 
 import (
+	"github.com/Sharykhin/go-payments/core/database/gorm"
 	"github.com/Sharykhin/go-payments/core/logger"
 	"github.com/Sharykhin/go-payments/core/queue"
 	"github.com/Sharykhin/go-payments/core/queue/rabbitmq"
 	identityRepository "github.com/Sharykhin/go-payments/domain/identity/repository"
 	identityService "github.com/Sharykhin/go-payments/domain/identity/service/identity"
+	"github.com/Sharykhin/go-payments/domain/payment/repository"
 	paymentService "github.com/Sharykhin/go-payments/domain/payment/service"
 	"github.com/Sharykhin/go-payments/domain/user/auth"
 	userService "github.com/Sharykhin/go-payments/domain/user/service"
@@ -44,7 +46,7 @@ func GetIdentityService() identityService.UserIdentity {
 	}
 
 	inst := identityService.NewIdentityService(
-		identityRepository.NewGORMRepository(),
+		identityRepository.NewGORMRepository(gorm.NewGORMConnection()),
 		logger.Log,
 		rabbitmq.NewQueue(),
 	)
@@ -88,12 +90,16 @@ func GetPaymentService() paymentService.PaymentService {
 	if _, ok := instances["PaymentService"]; ok {
 		return instances["PaymentService"].(paymentService.PaymentService)
 	}
+
 	inst := struct {
 		paymentService.PaymentCommander
 		paymentService.PaymentRetriever
 	}{
-		paymentService.NewAppPaymentCommander(),
-		paymentService.NewAppPaymentRetriever(),
+		paymentService.NewAppPaymentCommander(
+			repository.NewGORMRepository(gorm.NewGORMConnection()),
+			rabbitmq.NewQueue(),
+		),
+		paymentService.NewAppPaymentRetriever(repository.NewGORMRepository(gorm.NewGORMConnection())),
 	}
 
 	instances["PaymentService"] = inst

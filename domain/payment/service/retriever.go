@@ -19,9 +19,9 @@ type (
 
 // NewAppPaymentRetriever is a function constructor
 // that returns a concrete implementation of PaymentRetriever interface
-func NewAppPaymentRetriever() *AppPaymentRetriever {
+func NewAppPaymentRetriever(repo repository.PaymentRepository) *AppPaymentRetriever {
 	return &AppPaymentRetriever{
-		repository: repository.NewGORMRepository(),
+		repository: repo,
 	}
 }
 

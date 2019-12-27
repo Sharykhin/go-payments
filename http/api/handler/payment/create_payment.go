@@ -1,10 +1,13 @@
 package payment
 
 import (
+	"context"
 	"strconv"
+	"time"
+
+	paymentService "github.com/Sharykhin/go-payments/domain/payment/service"
 
 	"github.com/Sharykhin/go-payments/core/locator"
-	"github.com/Sharykhin/go-payments/domain/payment/request"
 	"github.com/Sharykhin/go-payments/domain/payment/value"
 	"github.com/Sharykhin/go-payments/http"
 	"github.com/Sharykhin/go-payments/http/validation"
@@ -23,8 +26,7 @@ func CreatePayment(c *gin.Context) {
 		return
 	}
 
-	user := c.Value(http.UserContext)
-	authUser, ok := user.(identityEntity.UserContext)
+	authUser, ok := c.Value(http.UserContext).(identityEntity.UserContext)
 	if !ok {
 		panic("create payment endpoint must be under auth middleware to consume identityEntity.UserContext")
 	}
@@ -41,12 +43,17 @@ func CreatePayment(c *gin.Context) {
 	}
 
 	service := locator.GetPaymentService()
+	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(15*time.Second))
+	defer cancel()
 
-	p, err := service.Create(c.Request.Context(), request.NewPayment{
-		Amount:      value.NewAmount(value.USD, decimal.NewFromFloat(req.Amount)),
-		Description: req.Description,
-		UserID:      int64(userID),
-	})
+	p, err := service.Create(
+		ctx,
+		paymentService.NewPaymentRequest{
+			Amount:      value.NewAmount(value.USD, decimal.NewFromFloat(req.Amount)),
+			Description: req.Description,
+			UserID:      int64(userID),
+		},
+	)
 
 	if err != nil {
 		http.BadRequest(c, http.Errors{err.Error()})

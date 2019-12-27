@@ -11,7 +11,6 @@ import (
 	types "github.com/Sharykhin/go-payments/core/type"
 	"github.com/Sharykhin/go-payments/domain/payment/model"
 	"github.com/Sharykhin/go-payments/domain/payment/repository"
-	"github.com/Sharykhin/go-payments/domain/payment/request"
 	"github.com/Sharykhin/go-payments/domain/payment/value"
 )
 
@@ -21,23 +20,32 @@ type (
 		repository repository.PaymentRepository
 		dispatcher queue.Publisher
 	}
+
+	NewPaymentRequest struct {
+		Amount      value.Amount
+		UserID      int64
+		Description string
+	}
 )
 
-func NewAppPaymentCommander() *AppPaymentCommander {
+func NewAppPaymentCommander(
+	repo repository.PaymentRepository,
+	dispatcher queue.Publisher,
+) *AppPaymentCommander {
 	return &AppPaymentCommander{
-		repository: repository.NewGORMRepository(),
-		dispatcher: queue.Default(),
+		repository: repo,
+		dispatcher: dispatcher,
 	}
 }
 
 // Create creates a new payment model
-func (a AppPaymentCommander) Create(ctx context.Context, r request.NewPayment) (*model.Payment, error) {
+func (a AppPaymentCommander) Create(ctx context.Context, req NewPaymentRequest) (*model.Payment, error) {
 
-	p, err := a.repository.Create(ctx, repository.Payment{
-		UserID:        r.UserID,
+	p, err := a.repository.Create(ctx, repository.PaymentAggregate{
+		UserID:        req.UserID,
 		TransactionID: value.NewTransactionID(),
-		Amount:        r.Amount.Value,
-		Description:   r.Description,
+		Amount:        req.Amount.Value,
+		Description:   req.Description,
 		ChargeDate:    time.Now().UTC(),
 		Status:        value.StatusOpen.String(),
 	})

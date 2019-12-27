@@ -6,7 +6,6 @@ import (
 
 	"github.com/jinzhu/gorm"
 
-	GORMDB "github.com/Sharykhin/go-payments/core/database/gorm"
 	types "github.com/Sharykhin/go-payments/core/type"
 	"github.com/Sharykhin/go-payments/domain/identity/repository/entity"
 )
@@ -61,8 +60,8 @@ func (r GORMRepository) Update(ctx context.Context, userID int64, fields UpdateF
 
 // NewGORMRepository is a constructor function
 // that returns a new instance of GORMRepository
-func NewGORMRepository() *GORMRepository {
+func NewGORMRepository(conn *gorm.DB) *GORMRepository {
 	return &GORMRepository{
-		conn: GORMDB.G,
+		conn: conn,
 	}
 }

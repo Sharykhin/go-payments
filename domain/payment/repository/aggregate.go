@@ -9,8 +9,8 @@ import (
 )
 
 type (
-	//Payment is a model on a repository level. Right now it has GORM implementation
-	Payment struct {
+	//PaymentAggregate is a aggregate model on a repository level. Right now it has GORM implementation
+	PaymentAggregate struct {
 		ID            int64           `gorm:"primary_key"`
 		TransactionID string          `gorm:"column:transaction_id"`
 		User          repository.User `gorm:"association_autoupdate:false" json:"-" `
@@ -23,6 +23,6 @@ type (
 )
 
 // TableName is a method that GORM uses to identify table name
-func (p Payment) TableName() string {
+func (p PaymentAggregate) TableName() string {
 	return "transactions"
 }

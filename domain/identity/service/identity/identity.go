@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/Sharykhin/go-payments/core/database/gorm"
 	"github.com/Sharykhin/go-payments/core/logger"
 	"github.com/Sharykhin/go-payments/core/queue"
 	"github.com/Sharykhin/go-payments/domain/identity/repository"
@@ -24,7 +25,7 @@ type (
 // a new instance of AppUserIdentity struct
 func NewUserIdentityService() *AppUserIdentity {
 	return &AppUserIdentity{
-		repository: repository.NewGORMRepository(),
+		repository: repository.NewGORMRepository(gorm.NewGORMConnection()),
 		logger:     logger.Log,
 		dispatcher: queue.Default(),
 	}

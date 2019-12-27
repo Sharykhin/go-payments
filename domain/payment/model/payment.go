@@ -36,7 +36,14 @@ type (
 )
 
 // NewPayment returns a new instance of Payment model
-func NewPayment(ID int64, Amount value.Amount, Description string, CreatedAt types.Time, User UserInterface) *Payment {
+func NewPayment(
+	ID int64,
+	Amount value.Amount,
+	Description string,
+	CreatedAt types.Time,
+	User UserInterface,
+) *Payment {
+
 	return &Payment{
 		id:          ID,
 		amount:      Amount,
@@ -48,6 +55,7 @@ func NewPayment(ID int64, Amount value.Amount, Description string, CreatedAt typ
 
 // MarshalJSON implements json.Marshaler interface
 // TODO: since we are using view model concept this method can be removed?
+// TODO: eventually I like an idea of marshaling struct
 func (p *Payment) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		ID          int64       `json:"ID"`
