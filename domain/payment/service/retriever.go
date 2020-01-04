@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/Sharykhin/go-payments/core/file/local"
 
 	types "github.com/Sharykhin/go-payments/core/type"
 	"github.com/Sharykhin/go-payments/domain/payment/model"
@@ -46,6 +47,7 @@ func (a AppPaymentRetriever) LimitedList(ctx context.Context, offset, limit int6
 				payment.Description,
 				types.Time(payment.ChargeDate),
 				proxy.NewUserProxy(payment.UserID),
+				local.NewUploader(),
 			),
 		)
 	}

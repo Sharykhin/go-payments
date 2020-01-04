@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/Sharykhin/go-payments/core/file/local"
 	"time"
 
 	"github.com/Sharykhin/go-payments/domain/payment/proxy"
@@ -60,6 +61,7 @@ func (a AppPaymentCommander) Create(ctx context.Context, req NewPaymentRequest) 
 		req.Description,
 		types.Time(time.Now().UTC()),
 		proxy.NewUserProxy(req.UserID),
+		local.NewUploader(),
 	)
 
 	return payment, nil

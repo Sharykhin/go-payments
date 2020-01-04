@@ -2,6 +2,8 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/Sharykhin/go-payments/core/errors"
 	"github.com/Sharykhin/go-payments/core/file"
 	"os"
 
@@ -17,7 +19,9 @@ type (
 		description string
 		user        UserInterface
 		createdAt   types.Time
-		files       []file.FileURL
+		files       []string
+
+		fileUploader file.Uploader
 	}
 
 	// TODO: payment view doesn't look really handy, think about how it should be changed if that possible
@@ -45,6 +49,7 @@ func NewPayment(
 	Description string,
 	CreatedAt types.Time,
 	User UserInterface,
+	fileUploader file.Uploader,
 ) *Payment {
 
 	return &Payment{
@@ -101,6 +106,35 @@ func (p *Payment) ViewModel(view string) *PaymentView {
 	return vm
 }
 
-func (p *Payment) AttachFile(file *os.File) {
+func (p *Payment) AttachFile(f *os.File) error {
+	//validate income file
+	info, err := f.Stat()
+	if err != nil {
+		return fmt.Errorf("failed to get file statistic: %v", err)
+	}
 
+	kilobytes := info.Size() / 1024
+	megabytes := float64(kilobytes / 1024)
+
+	if megabytes > 5.00 {
+		return errors.FileIsTooBig
+	}
+
+	contentType, err := file.GetFileContentType(f)
+	if err != nil {
+		return fmt.Errorf("failed to get file content type: %v", err)
+	}
+
+	if contentType != "application/pdf" {
+		return fmt.Errorf("unsupported file content type: %s", contentType)
+	}
+
+	url, err := p.fileUploader.UploadFile(f)
+	if err != nil {
+		return fmt.Errorf("failed to upload file: %v", err)
+	}
+
+	p.files = append(p.files, url)
+
+	return nil
 }
