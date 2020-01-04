@@ -56,10 +56,10 @@ func (a AppPaymentCommander) Create(ctx context.Context, req NewPaymentRequest) 
 
 	payment := model.NewPayment(
 		p.ID,
-		r.Amount,
-		r.Description,
+		req.Amount,
+		req.Description,
 		types.Time(time.Now().UTC()),
-		proxy.NewUserProxy(r.UserID),
+		proxy.NewUserProxy(req.UserID),
 	)
 
 	return payment, nil

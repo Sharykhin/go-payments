@@ -2,6 +2,8 @@ package model
 
 import (
 	"encoding/json"
+	"github.com/Sharykhin/go-payments/core/file"
+	"os"
 
 	types "github.com/Sharykhin/go-payments/core/type"
 	"github.com/Sharykhin/go-payments/domain/payment/value"
@@ -15,6 +17,7 @@ type (
 		description string
 		user        UserInterface
 		createdAt   types.Time
+		files       []file.FileURL
 	}
 
 	// TODO: payment view doesn't look really handy, think about how it should be changed if that possible
@@ -96,4 +99,8 @@ func (p *Payment) ViewModel(view string) *PaymentView {
 		Email: p.user.GetEmail(),
 	}
 	return vm
+}
+
+func (p *Payment) AttachFile(file *os.File) {
+
 }

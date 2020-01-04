@@ -10,6 +10,10 @@ type (
 	Time time.Time
 )
 
+func TimeNow() Time {
+	return Time(time.Now().UTC())
+}
+
 // MarshalJSON implements json.Marshaler interface
 func (t Time) MarshalJSON() ([]byte, error) {
 	return []byte(time.Time(t).Format(`"` + core.ISO8601 + `"`)), nil

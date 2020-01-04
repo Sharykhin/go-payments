@@ -1,8 +1,6 @@
 package model
 
 import (
-	"time"
-
 	types "github.com/Sharykhin/go-payments/core/type"
 )
 
@@ -44,7 +42,7 @@ func NewUser(id int64, firstName, email string, lastName types.NullString, ident
 		firstName: firstName,
 		lastName:  lastName,
 		email:     email,
-		createdAt: types.Time(time.Now().UTC()),
+		createdAt: types.TimeNow(),
 		identity:  identity,
 	}
 }

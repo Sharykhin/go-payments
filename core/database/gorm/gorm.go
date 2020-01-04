@@ -38,7 +38,8 @@ func init() {
 
 // NewGORMConnection returns a GORM connection
 func NewGORMConnection() *gorm.DB {
-	sync.Once{}.Do(func() {
+	var once sync.Once
+	once.Do(func() {
 		g = connect(true)
 	})
 
