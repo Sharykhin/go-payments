@@ -9,7 +9,6 @@ import (
 	GORMDB "github.com/Sharykhin/go-payments/core/database/gorm"
 	"github.com/Sharykhin/go-payments/core/errors"
 	"github.com/Sharykhin/go-payments/core/logger"
-	"github.com/Sharykhin/go-payments/domain/user/repository/entity"
 )
 
 type (
@@ -30,7 +29,7 @@ func NewGORMRepository() *GORMRepository {
 }
 
 // Create creates a new user in a database and returns just created record
-func (r GORMRepository) Create(ctx context.Context, user entity.User) (*entity.User, error) {
+func (r GORMRepository) Create(ctx context.Context, user User) (*User, error) {
 	err := r.conn.Create(&user).Error
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert a new user row: %v", err)
@@ -41,8 +40,8 @@ func (r GORMRepository) Create(ctx context.Context, user entity.User) (*entity.U
 
 // FindByEmail looks for user by its email and takes the first one.
 // Actually email should be unique
-func (r GORMRepository) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
-	user := entity.User{Email: email}
+func (r GORMRepository) FindByEmail(ctx context.Context, email string) (*User, error) {
+	user := User{Email: email}
 	err := r.conn.Where(&user).First(&user).Error
 
 	if err != nil {
@@ -56,8 +55,9 @@ func (r GORMRepository) FindByEmail(ctx context.Context, email string) (*entity.
 	return &user, nil
 }
 
-func (r GORMRepository) FindByID(ctx context.Context, ID int64) (*entity.User, error) {
-	user := entity.User{ID: ID}
+// FindByID finds user by its ID
+func (r GORMRepository) FindByID(ctx context.Context, ID int64) (*User, error) {
+	user := User{ID: ID}
 	err := r.conn.Where(&user).First(&user).Error
 
 	if err != nil {

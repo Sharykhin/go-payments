@@ -8,10 +8,9 @@ import (
 	"github.com/Sharykhin/go-payments/core/logger"
 	"github.com/Sharykhin/go-payments/core/queue"
 	"github.com/Sharykhin/go-payments/domain/identity/service/identity"
-	userApplicationEntity "github.com/Sharykhin/go-payments/domain/user/application/entity"
 	"github.com/Sharykhin/go-payments/domain/user/application/request"
+	useModel "github.com/Sharykhin/go-payments/domain/user/model"
 	"github.com/Sharykhin/go-payments/domain/user/repository"
-	userRepositoryEntity "github.com/Sharykhin/go-payments/domain/user/repository/entity"
 )
 
 type (
@@ -32,24 +31,29 @@ func NewAppUserCommander() *AppUserCommander {
 	}
 }
 
-func (s AppUserCommander) Create(ctx context.Context, req request.UserCreateRequest) (*userApplicationEntity.User, error) {
-	user := userRepositoryEntity.NewUser(req.FirstName, req.LastName.String, req.Email)
+func (s AppUserCommander) Create(ctx context.Context, req request.UserCreateRequest) (*useModel.User, error) {
 
-	newUser, err := s.userRepository.Create(ctx, user)
+	ua, err := s.userRepository.Create(ctx, repository.User{
+		FirstName: req.FirstName,
+		LastName:  req.LastName,
+		Email:     req.Email,
+	})
 
 	if err != nil {
 		return nil, fmt.Errorf("could not create a new user: %v", err)
 	}
 
-	pass, err := s.userIdentityService.CreatePassword(ctx, newUser.ID, req.Password)
+	password, err := s.userIdentityService.CreatePassword(ctx, ua.ID, req.Password)
 	if err != nil {
-		s.raiseFailedPasswordCreation(newUser.ID)
+		s.raiseFailedPasswordCreation(ua.ID)
 		return nil, fmt.Errorf("could not create user's password: %v", err)
 	}
 
-	appUser := userApplicationEntity.NewUserFromRepository(newUser, pass)
+	appUser := useModel.NewUser(ua.ID, ua.FirstName, ua.Email, ua.LastName, useModel.Identity{
+		Password: password,
+	})
 
-	s.raiseUserSuccessCreation(newUser.ID)
+	s.raiseUserSuccessCreation(ua.ID)
 
 	return appUser, err
 }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/Sharykhin/go-payments/domain/identity/service/identity"
 
-	userApplicationEntity "github.com/Sharykhin/go-payments/domain/user/application/entity"
+	"github.com/Sharykhin/go-payments/domain/user/model"
 	"github.com/Sharykhin/go-payments/domain/user/repository"
 )
 
@@ -26,36 +26,40 @@ func NewAppUserRetriever() *AppUserRetriever {
 	}
 }
 
-func (s AppUserRetriever) FindUserByEmail(ctx context.Context, email string) (*userApplicationEntity.User, error) {
-	u, err := s.userRepository.FindByEmail(ctx, email)
+func (s AppUserRetriever) FindUserByEmail(ctx context.Context, email string) (*model.User, error) {
+	ua, err := s.userRepository.FindByEmail(ctx, email)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user from a repository: %v", err)
 	}
 
-	password, err := s.userIdentityService.FindUserPassword(ctx, u.ID)
+	password, err := s.userIdentityService.FindUserPassword(ctx, ua.ID)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to find user password: %v", err)
 	}
 
-	ua := userApplicationEntity.NewUserFromRepository(u, password)
+	user := model.NewUser(ua.ID, ua.FirstName, ua.Email, ua.LastName, model.Identity{
+		Password: password,
+	})
 
-	return ua, nil
+	return user, nil
 }
 
-func (s AppUserRetriever) FindByID(ctx context.Context, ID int64) (*userApplicationEntity.User, error) {
-	u, err := s.userRepository.FindByID(ctx, ID)
+func (s AppUserRetriever) FindByID(ctx context.Context, ID int64) (*model.User, error) {
+	ua, err := s.userRepository.FindByID(ctx, ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user from a repository: %v", err)
 	}
 
-	password, err := s.userIdentityService.FindUserPassword(ctx, u.ID)
+	password, err := s.userIdentityService.FindUserPassword(ctx, ua.ID)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to find user password: %v", err)
 	}
 
-	ua := userApplicationEntity.NewUserFromRepository(u, password)
+	user := model.NewUser(ua.ID, ua.FirstName, ua.Email, ua.LastName, model.Identity{
+		Password: password,
+	})
 
-	return ua, nil
+	return user, nil
 }

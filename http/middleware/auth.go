@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -9,6 +8,7 @@ import (
 	identityEntity "github.com/Sharykhin/go-payments/domain/identity/entity"
 	tokenPkg "github.com/Sharykhin/go-payments/domain/identity/service/token"
 	tokenErrors "github.com/Sharykhin/go-payments/domain/identity/service/token/error"
+	"github.com/Sharykhin/go-payments/http"
 	httpApp "github.com/Sharykhin/go-payments/http"
 )
 
@@ -25,9 +25,8 @@ func AuthByToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader(authHeader)
 		if !strings.Contains(authHeader, headerType) {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "Authorization header with Bearer type is required",
-			})
+			http.Unauthorized(c, http.Errors{"Authorization header with Bearer type is required"})
+			c.Abort()
 			return
 		}
 
@@ -36,15 +35,13 @@ func AuthByToken() gin.HandlerFunc {
 		claims, err := tokenService.Validate(tokenString)
 		if err != nil {
 			if err == tokenErrors.TokenIsExpired {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-					"error": "Token is expired",
-				})
+				http.Unauthorized(c, http.Errors{"Token is expired"})
+				c.Abort()
 				return
 			}
 
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
-			})
+			http.ServerError(c, http.Errors{err.Error()})
+			c.Abort()
 			return
 
 		}

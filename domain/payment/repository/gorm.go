@@ -5,8 +5,6 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
-
-	GORMDB "github.com/Sharykhin/go-payments/core/database/gorm"
 )
 
 type (
@@ -19,14 +17,14 @@ type (
 
 // NewGORMRepository is a constructor function that returns a new instance of GORMRepository
 // and satisfies PaymentRepository interface
-func NewGORMRepository() *GORMRepository {
+func NewGORMRepository(conn *gorm.DB) *GORMRepository {
 	return &GORMRepository{
-		conn: GORMDB.G,
+		conn: conn,
 	}
 }
 
 // Create creates a new payment record in a database and returns just created record
-func (r GORMRepository) Create(cxt context.Context, payment Payment) (*Payment, error) {
+func (r GORMRepository) Create(cxt context.Context, payment PaymentAggregate) (*PaymentAggregate, error) {
 	err := r.conn.Create(&payment).Error
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert a new payment row: %v", err)
@@ -35,13 +33,25 @@ func (r GORMRepository) Create(cxt context.Context, payment Payment) (*Payment, 
 	return &payment, nil
 }
 
-func (r GORMRepository) List(ctx context.Context, criteria ...Criteria) ([]Payment, int64, error) {
-	var p []Payment
+// List returns list of payments rows
+// Can accept various of criteria, such as limit criteria and etc.
+func (r GORMRepository) List(ctx context.Context, criteria ...Criteria) ([]PaymentAggregate, error) {
+	var p []PaymentAggregate
+	builder := r.conn.Order("created_at desc")
 
-	err := r.conn.Order("created_at desc").Limit(10).Find(&p).Error
-	if err != nil {
-		return nil, 0, fmt.Errorf("failed to execute select statement to return a list of payments: %v", err)
+	for _, criteriaItem := range criteria {
+		if criteriaItem.Name() == LimitCriteriaName {
+			limitCriteria := criteriaItem.(LimitCriteria)
+
+			builder.Offset(limitCriteria.Offset)
+			builder.Limit(limitCriteria.Limit)
+		}
 	}
 
-	return p, int64(len(p)), nil
+	err := builder.Find(&p).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute select statement to return a list of payments: %v", err)
+	}
+
+	return p, nil
 }

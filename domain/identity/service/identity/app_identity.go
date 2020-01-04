@@ -22,6 +22,22 @@ type (
 	}
 )
 
+// NewIdentityService returns a new instance of identity service
+// This service is used as port to integrate with other contexts
+// or any component can use that UserIdentity API to interact with identity context
+func NewIdentityService(
+	repository repository.IdentityRepository,
+	logger logger.Logger,
+	dispatcher queue.Publisher,
+) *AppUserIdentity {
+
+	return &AppUserIdentity{
+		repository: repository,
+		logger:     logger,
+		dispatcher: dispatcher,
+	}
+}
+
 // CreatePassword creates a new password for a given user ID. it applies a corresponding hash function
 // and raises an event that a user password has been created.
 func (a AppUserIdentity) CreatePassword(ctx context.Context, userID int64, pass string) (string, error) {
