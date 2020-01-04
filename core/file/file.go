@@ -1,6 +1,7 @@
 package file
 
 import (
+	"context"
 	"net/http"
 	"os"
 )
@@ -8,7 +9,7 @@ import (
 type (
 	URL      string
 	Uploader interface {
-		UploadFile(f *os.File) (string, error)
+		UploadFile(ctx context.Context, f *os.File) (string, error)
 	}
 )
 

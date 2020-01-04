@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/Sharykhin/go-payments/core/file/local"
+	"github.com/Sharykhin/go-payments/core/queue/rabbitmq"
 	"time"
 
 	"github.com/Sharykhin/go-payments/domain/payment/proxy"
@@ -62,6 +63,7 @@ func (a AppPaymentCommander) Create(ctx context.Context, req NewPaymentRequest) 
 		types.Time(time.Now().UTC()),
 		proxy.NewUserProxy(req.UserID),
 		local.NewUploader(),
+		rabbitmq.NewQueue(),
 	)
 
 	return payment, nil

@@ -1,6 +1,7 @@
 package local
 
 import (
+	"context"
 	"os"
 )
 
@@ -9,7 +10,7 @@ type (
 	}
 )
 
-func (u *Uploader) UploadFile(f *os.File) (string, error) {
+func (u *Uploader) UploadFile(ctx context.Context, f *os.File) (string, error) {
 	return "", nil
 }
 

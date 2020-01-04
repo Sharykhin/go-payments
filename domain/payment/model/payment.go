@@ -1,10 +1,15 @@
 package model
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/Sharykhin/go-payments/core/errors"
+	"github.com/Sharykhin/go-payments/core/event"
 	"github.com/Sharykhin/go-payments/core/file"
+	"github.com/Sharykhin/go-payments/core/logger"
+	"github.com/Sharykhin/go-payments/core/queue"
+	"github.com/Sharykhin/go-payments/core/queue/rabbitmq"
 	"os"
 
 	types "github.com/Sharykhin/go-payments/core/type"
@@ -22,6 +27,7 @@ type (
 		files       []string
 
 		fileUploader file.Uploader
+		dispatcher   queue.Publisher
 	}
 
 	// TODO: payment view doesn't look really handy, think about how it should be changed if that possible
@@ -49,16 +55,25 @@ func NewPayment(
 	Description string,
 	CreatedAt types.Time,
 	User UserInterface,
+
 	fileUploader file.Uploader,
+	dispatcher queue.Publisher,
 ) *Payment {
 
-	return &Payment{
+	p := Payment{
 		id:          ID,
 		amount:      Amount,
 		description: Description,
 		createdAt:   CreatedAt,
 		user:        User,
+
+		fileUploader: fileUploader,
+		dispatcher:   dispatcher,
 	}
+
+	p.dispatcher = rabbitmq.NewQueue()
+
+	return &p
 }
 
 // MarshalJSON implements json.Marshaler interface
@@ -106,7 +121,7 @@ func (p *Payment) ViewModel(view string) *PaymentView {
 	return vm
 }
 
-func (p *Payment) AttachFile(f *os.File) error {
+func (p *Payment) AttachFile(ctx context.Context, f *os.File) error {
 	//validate income file
 	info, err := f.Stat()
 	if err != nil {
@@ -129,12 +144,25 @@ func (p *Payment) AttachFile(f *os.File) error {
 		return fmt.Errorf("unsupported file content type: %s", contentType)
 	}
 
-	url, err := p.fileUploader.UploadFile(f)
+	url, err := p.fileUploader.UploadFile(ctx, f)
 	if err != nil {
 		return fmt.Errorf("failed to upload file: %v", err)
 	}
 
 	p.files = append(p.files, url)
+
+	err = p.dispatcher.RaiseEvent(
+		event.NewEvent(
+			event.FileAttached,
+			event.Payload{
+				"PaymentID": p.id,
+			},
+		),
+	)
+
+	if err != nil {
+		logger.Log.Error("failed to dispatch an event: %v", err)
+	}
 
 	return nil
 }

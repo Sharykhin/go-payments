@@ -10,6 +10,7 @@ const (
 	UserPasswordCreationFailedEvent = "UserPasswordCreationFailedEvent"
 	UserPasswordCreatedEvent        = "UserPasswordCreatedEvent"
 	UserSignIn                      = "UserSignIn"
+	FileAttached                    = "FileAttached"
 )
 
 type (
