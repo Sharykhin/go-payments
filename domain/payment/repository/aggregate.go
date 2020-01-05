@@ -9,7 +9,7 @@ import (
 )
 
 type (
-	//PaymentAggregate is a aggregate model on a repository level. Right now it has GORM implementation
+	//PaymentAggregate is an aggregate model on a repository level. Right now it has GORM implementation
 	PaymentAggregate struct {
 		ID            int64           `gorm:"primary_key"`
 		TransactionID string          `gorm:"column:transaction_id"`

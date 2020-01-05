@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Sharykhin/go-payments/core/errors"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -54,4 +56,15 @@ func (r GORMRepository) List(ctx context.Context, criteria ...Criteria) ([]Payme
 	}
 
 	return p, nil
+}
+
+// FindByID returns a payment aggregate by its id
+func (r GORMRepository) FindByID(ctx context.Context, ID int64) (*PaymentAggregate, error) {
+	var p PaymentAggregate
+	err := r.conn.Where(&PaymentAggregate{ID: ID}).First(&p).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, errors.ResourceNotFound
+	}
+
+	return &p, nil
 }

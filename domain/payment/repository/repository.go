@@ -13,6 +13,7 @@ type (
 	PaymentRepository interface {
 		Create(cxt context.Context, payment PaymentAggregate) (*PaymentAggregate, error)
 		List(ctx context.Context, criteria ...Criteria) ([]PaymentAggregate, error)
+		FindByID(ctx context.Context, ID int64) (*PaymentAggregate, error)
 	}
 
 	// Criteria describes general conditional criteria

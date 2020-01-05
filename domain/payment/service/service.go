@@ -14,6 +14,10 @@ type (
 		PaymentRetriever
 	}
 
+	PaymentAttachmentService interface {
+		AttachFile(ctx context.Context, p *model.Payment) error
+	}
+
 	// PaymentRetriever is an interface that is responsible for retrieving payment.
 	// And it works like some sort of a factory. Take into account it has not side effect
 	PaymentRetriever interface {
