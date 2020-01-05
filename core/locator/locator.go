@@ -7,26 +7,27 @@ import (
 	"github.com/Sharykhin/go-payments/core/queue/rabbitmq"
 	identityRepository "github.com/Sharykhin/go-payments/domain/identity/repository"
 	identityService "github.com/Sharykhin/go-payments/domain/identity/service/identity"
-	"github.com/Sharykhin/go-payments/domain/payment/factory"
+	"github.com/Sharykhin/go-payments/domain/identity/service/token"
+	paymentFactory "github.com/Sharykhin/go-payments/domain/payment/factory"
 	"github.com/Sharykhin/go-payments/domain/payment/repository"
 	paymentService "github.com/Sharykhin/go-payments/domain/payment/service"
-	"github.com/Sharykhin/go-payments/domain/user/auth"
 	userService "github.com/Sharykhin/go-payments/domain/user/service"
+	"sync"
 )
 
 var (
 	instances map[string]interface{} = make(map[string]interface{})
+	logImpl   logger.Logger
+	queueImpl queue.QueueManager
 )
 
-// GetDefaultQueue returns a default queue manager
-// if that manager has already been initialized, return existing instance
-func GetDefaultQueue() queue.QueueManager {
-	if _, ok := instances["QueueManager"]; ok {
-		return instances["QueueManager"].(queue.QueueManager)
-	}
-	inst := queue.Default()
-	instances["QueueManager"] = inst
-	return inst
+func init() {
+	logImpl = logger.NewLogger()
+	queueImpl = rabbitmq.NewQueue()
+}
+
+func GetQueueService() queue.QueueManager {
+	return queueImpl
 }
 
 // GetUserService returns an implementation of UserService interface
@@ -42,27 +43,29 @@ func GetUserService() userService.UserService {
 
 // GetIdentityService returns implementation of UserIdentity interface
 func GetIdentityService() identityService.UserIdentity {
-	if _, ok := instances["UserIdentity"]; ok {
-		return instances["UserIdentity"].(identityService.UserIdentity)
-	}
+	var once sync.Once
+	once.Do(func() {
+		inst := identityService.NewIdentityService(
+			identityRepository.NewGORMRepository(
+				gorm.NewGORMConnection(),
+			),
+			logImpl,
+			queueImpl,
+		)
+		instances["UserIdentity"] = inst
+	})
 
-	inst := identityService.NewIdentityService(
-		identityRepository.NewGORMRepository(gorm.NewGORMConnection()),
-		logger.Log,
-		rabbitmq.NewQueue(),
-	)
-	instances["UserIdentity"] = inst
-	return inst
+	return instances["UserIdentity"].(identityService.UserIdentity)
 }
 
-func NeUserAuthenticationService() auth.UserAuth {
-	if _, ok := instances["UserAuthentication"]; ok {
-		return instances["UserAuthentication"].(auth.UserAuth)
-	}
-	inst := auth.NewAppUserAuth()
-	instances["UserAuthentication"] = inst
+func GetTokenService() token.Tokener {
+	var once sync.Once
+	once.Do(func() {
+		inst := token.NewTokenService(token.TypeJWF)
+		instances["Tokener"] = inst
+	})
 
-	return inst
+	return instances["Tokener"].(token.Tokener)
 }
 
 func GetUserCommanderService() userService.UserCommander {
@@ -88,26 +91,30 @@ func GetUserRetrieverService() userService.UserRetriever {
 // GetPaymentService returns an instance of payment service
 // that includes either as mutator as retriever.
 func GetPaymentService() paymentService.PaymentService {
-	if _, ok := instances["PaymentService"]; ok {
-		return instances["PaymentService"].(paymentService.PaymentService)
-	}
+	var once sync.Once
 
-	inst := struct {
-		paymentService.PaymentCommander
-		paymentService.PaymentRetriever
-	}{
-		paymentService.NewAppPaymentCommander(
-			repository.NewGORMRepository(gorm.NewGORMConnection()),
-			rabbitmq.NewQueue(),
-			factory.NewPaymentFactory(),
-		),
-		paymentService.NewAppPaymentRetriever(
-			repository.NewGORMRepository(gorm.NewGORMConnection()),
-			factory.NewPaymentFactory(),
-		),
-	}
+	once.Do(func() {
+		inst := struct {
+			paymentService.PaymentCommander
+			paymentService.PaymentRetriever
+		}{
+			paymentService.NewAppPaymentCommander(
+				repository.NewGORMRepository(
+					gorm.NewGORMConnection(),
+				),
+				queueImpl,
+				paymentFactory.NewPaymentFactory(),
+			),
+			paymentService.NewAppPaymentRetriever(
+				repository.NewGORMRepository(
+					gorm.NewGORMConnection(),
+				),
+				paymentFactory.NewPaymentFactory(),
+			),
+		}
 
-	instances["PaymentService"] = inst
+		instances["PaymentService"] = inst
+	})
 
-	return inst
+	return instances["PaymentService"].(paymentService.PaymentService)
 }

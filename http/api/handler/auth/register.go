@@ -1,13 +1,15 @@
 package auth
 
 import (
+	"github.com/Sharykhin/go-payments/core/queue"
+	"github.com/Sharykhin/go-payments/domain/user/service"
 	"github.com/gin-gonic/gin"
 
 	"github.com/Sharykhin/go-payments/core/event"
-	"github.com/Sharykhin/go-payments/core/locator"
 	"github.com/Sharykhin/go-payments/core/logger"
 	identityEntity "github.com/Sharykhin/go-payments/domain/identity/entity"
 	"github.com/Sharykhin/go-payments/domain/user/application/request"
+
 	"github.com/Sharykhin/go-payments/http"
 	ar "github.com/Sharykhin/go-payments/http/request/auth"
 	"github.com/Sharykhin/go-payments/http/validation"
@@ -15,14 +17,16 @@ import (
 
 // Register method creates a new consumer in the system.
 // Then it raises a separate event so we can send a welcome email if it is necessary
-func Register(c *gin.Context) {
+func Register(
+	c *gin.Context,
+	userService service.UserCommander,
+	dispatcher queue.Publisher,
+) {
 	var req ar.RegisterRequest
 	if isValid, errors := validation.ValidateRequest(c, &req); !isValid {
 		http.BadRequest(c, http.Errors(errors))
 		return
 	}
-
-	userService := locator.GetUserCommanderService()
 
 	user, err := userService.Create(c.Request.Context(), request.UserCreateRequest{
 		FirstName: req.FirstName,
@@ -37,16 +41,14 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	raiseSuccessfulRegistration(user.GetID())
+	raiseSuccessfulRegistration(user.GetID(), dispatcher)
 
 	http.Created(c, http.Data{
 		"User": user,
 	}, nil)
 }
 
-func raiseSuccessfulRegistration(userId int64) {
-	dispatcher := locator.GetDefaultQueue()
-
+func raiseSuccessfulRegistration(userId int64, dispatcher queue.Publisher) {
 	err := dispatcher.RaiseEvent(event.NewEvent(event.UserRegisteredEvent, event.Payload{
 		"ID": userId,
 	}))

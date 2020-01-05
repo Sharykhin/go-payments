@@ -28,6 +28,13 @@ func init() {
 	}
 }
 
+func NewLogger() Logger {
+	return logger{
+		err: log.New(os.Stderr, "", 0),
+		out: log.New(os.Stdout, "", 0),
+	}
+}
+
 func (l logger) Info(format string, v ...interface{}) {
 	l.out.Printf(format, v...)
 }

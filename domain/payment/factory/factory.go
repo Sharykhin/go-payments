@@ -10,7 +10,13 @@ import (
 
 type (
 	PaymentFactory interface {
-		NewPayment(id int64, amount value.Amount, description string, user model.UserInterface) *model.Payment
+		NewPayment(
+			id int64,
+			amount value.Amount,
+			description string,
+			createdAt types.Time,
+			user model.UserInterface,
+		) *model.Payment
 	}
 
 	paymentFactory struct {
@@ -25,13 +31,14 @@ func (f paymentFactory) NewPayment(
 	id int64,
 	amount value.Amount,
 	description string,
+	createdAt types.Time,
 	user model.UserInterface,
 ) *model.Payment {
 	return model.NewPayment(
 		id,
 		amount,
 		description,
-		types.TimeNow(),
+		createdAt,
 		user,
 		local.NewUploader(),
 		rabbitmq.NewQueue(),

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/Sharykhin/go-payments/core/type"
 	"time"
 
 	"github.com/Sharykhin/go-payments/core/queue"
@@ -60,6 +61,7 @@ func (a AppPaymentCommander) Create(ctx context.Context, req NewPaymentRequest) 
 		pa.ID,
 		req.Amount,
 		req.Description,
+		types.TimeNow(),
 		proxy.NewUserProxy(req.UserID),
 	)
 

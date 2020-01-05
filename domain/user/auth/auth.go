@@ -52,17 +52,6 @@ func NewUserAuth(
 	}
 }
 
-// NewAppUserAuth this is a function constructor
-// that returns a new instance of AppUserAuth struct
-func NewAppUserAuth() *AppUserAuth {
-	return &AppUserAuth{
-		userRetriever: service.NewAppUserRetriever(),
-		userIdentity:  identity.NewUserIdentityService(),
-		token:         token.NewTokenService(token.TypeJWF),
-		dispatcher:    queue.Default(),
-	}
-}
-
 // SingIn signs user in by using general credentials such as email and password
 // It also generate JWT token.
 //TODO: just return JWT token it would be more semantic and obvious

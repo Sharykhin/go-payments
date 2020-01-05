@@ -3,11 +3,9 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/Sharykhin/go-payments/core/file/local"
-	"github.com/Sharykhin/go-payments/core/queue/rabbitmq"
-	"github.com/Sharykhin/go-payments/domain/payment/factory"
 
 	types "github.com/Sharykhin/go-payments/core/type"
+	"github.com/Sharykhin/go-payments/domain/payment/factory"
 	"github.com/Sharykhin/go-payments/domain/payment/model"
 	"github.com/Sharykhin/go-payments/domain/payment/proxy"
 	"github.com/Sharykhin/go-payments/domain/payment/repository"
@@ -52,7 +50,7 @@ func (a AppPaymentRetriever) LimitedList(ctx context.Context, offset, limit int6
 				payment.ID,
 				value.NewAmount(value.USD, payment.Amount),
 				payment.Description,
-				//types.Time(payment.ChargeDate),
+				types.Time(payment.ChargeDate),
 				proxy.NewUserProxy(payment.UserID),
 			),
 		)
