@@ -14,6 +14,7 @@ type (
 		PaymentRetriever
 	}
 
+	//TODO: deprecated
 	PaymentAttachmentService interface {
 		AttachFile(ctx context.Context, p *model.Payment) error
 	}

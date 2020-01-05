@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Sharykhin/go-payments/core/file/local"
 	"github.com/Sharykhin/go-payments/core/queue/rabbitmq"
+	"github.com/Sharykhin/go-payments/domain/payment/factory"
 
 	types "github.com/Sharykhin/go-payments/core/type"
 	"github.com/Sharykhin/go-payments/domain/payment/model"
@@ -15,15 +16,20 @@ import (
 
 type (
 	AppPaymentRetriever struct {
-		repository repository.PaymentRepository
+		repository     repository.PaymentRepository
+		paymentFactory factory.PaymentFactory
 	}
 )
 
 // NewAppPaymentRetriever is a function constructor
 // that returns a concrete implementation of PaymentRetriever interface
-func NewAppPaymentRetriever(repo repository.PaymentRepository) *AppPaymentRetriever {
+func NewAppPaymentRetriever(
+	repository repository.PaymentRepository,
+	paymentFactory factory.PaymentFactory,
+) *AppPaymentRetriever {
 	return &AppPaymentRetriever{
-		repository: repo,
+		repository:     repository,
+		paymentFactory: paymentFactory,
 	}
 }
 
@@ -42,15 +48,12 @@ func (a AppPaymentRetriever) LimitedList(ctx context.Context, offset, limit int6
 	for _, payment := range payments {
 		pp = append(
 			pp,
-			*model.NewPayment(
+			*a.paymentFactory.NewPayment(
 				payment.ID,
 				value.NewAmount(value.USD, payment.Amount),
 				payment.Description,
-				types.Time(payment.ChargeDate),
+				//types.Time(payment.ChargeDate),
 				proxy.NewUserProxy(payment.UserID),
-
-				local.NewUploader(),
-				rabbitmq.NewQueue(),
 			),
 		)
 	}

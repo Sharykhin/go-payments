@@ -3,15 +3,12 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/Sharykhin/go-payments/core/file/local"
-	"github.com/Sharykhin/go-payments/core/queue/rabbitmq"
 	"time"
 
-	"github.com/Sharykhin/go-payments/domain/payment/proxy"
-
 	"github.com/Sharykhin/go-payments/core/queue"
-	types "github.com/Sharykhin/go-payments/core/type"
+	"github.com/Sharykhin/go-payments/domain/payment/factory"
 	"github.com/Sharykhin/go-payments/domain/payment/model"
+	"github.com/Sharykhin/go-payments/domain/payment/proxy"
 	"github.com/Sharykhin/go-payments/domain/payment/repository"
 	"github.com/Sharykhin/go-payments/domain/payment/value"
 )
@@ -19,8 +16,9 @@ import (
 type (
 	// AppPaymentCommander is a concrete struct that implements PaymentCommander interface
 	AppPaymentCommander struct {
-		repository repository.PaymentRepository
-		dispatcher queue.Publisher
+		repository     repository.PaymentRepository
+		dispatcher     queue.Publisher
+		paymentFactory factory.PaymentFactory
 	}
 
 	NewPaymentRequest struct {
@@ -33,17 +31,19 @@ type (
 func NewAppPaymentCommander(
 	repo repository.PaymentRepository,
 	dispatcher queue.Publisher,
+	paymentFactory factory.PaymentFactory,
 ) *AppPaymentCommander {
 	return &AppPaymentCommander{
-		repository: repo,
-		dispatcher: dispatcher,
+		repository:     repo,
+		dispatcher:     dispatcher,
+		paymentFactory: paymentFactory,
 	}
 }
 
 // Create creates a new payment model
 func (a AppPaymentCommander) Create(ctx context.Context, req NewPaymentRequest) (*model.Payment, error) {
 
-	p, err := a.repository.Create(ctx, repository.PaymentAggregate{
+	pa, err := a.repository.Create(ctx, repository.PaymentAggregate{
 		UserID:        req.UserID,
 		TransactionID: value.NewTransactionID(),
 		Amount:        req.Amount.Value,
@@ -56,14 +56,11 @@ func (a AppPaymentCommander) Create(ctx context.Context, req NewPaymentRequest) 
 		return nil, fmt.Errorf("failed to create a new payment")
 	}
 
-	payment := model.NewPayment(
-		p.ID,
+	payment := a.paymentFactory.NewPayment(
+		pa.ID,
 		req.Amount,
 		req.Description,
-		types.Time(time.Now().UTC()),
 		proxy.NewUserProxy(req.UserID),
-		local.NewUploader(),
-		rabbitmq.NewQueue(),
 	)
 
 	return payment, nil

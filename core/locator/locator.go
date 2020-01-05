@@ -7,6 +7,7 @@ import (
 	"github.com/Sharykhin/go-payments/core/queue/rabbitmq"
 	identityRepository "github.com/Sharykhin/go-payments/domain/identity/repository"
 	identityService "github.com/Sharykhin/go-payments/domain/identity/service/identity"
+	"github.com/Sharykhin/go-payments/domain/payment/factory"
 	"github.com/Sharykhin/go-payments/domain/payment/repository"
 	paymentService "github.com/Sharykhin/go-payments/domain/payment/service"
 	"github.com/Sharykhin/go-payments/domain/user/auth"
@@ -98,8 +99,12 @@ func GetPaymentService() paymentService.PaymentService {
 		paymentService.NewAppPaymentCommander(
 			repository.NewGORMRepository(gorm.NewGORMConnection()),
 			rabbitmq.NewQueue(),
+			factory.NewPaymentFactory(),
 		),
-		paymentService.NewAppPaymentRetriever(repository.NewGORMRepository(gorm.NewGORMConnection())),
+		paymentService.NewAppPaymentRetriever(
+			repository.NewGORMRepository(gorm.NewGORMConnection()),
+			factory.NewPaymentFactory(),
+		),
 	}
 
 	instances["PaymentService"] = inst
