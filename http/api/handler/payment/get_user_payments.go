@@ -1,16 +1,15 @@
 package payment
 
 import (
+	"github.com/Sharykhin/go-payments/domain/payment/service"
 	"github.com/gin-gonic/gin"
 
-	"github.com/Sharykhin/go-payments/core/locator"
 	"github.com/Sharykhin/go-payments/domain/payment/model"
 	"github.com/Sharykhin/go-payments/http"
 )
 
 // GetUserPayments returns list of user's payments
-func GetUserPayments(c *gin.Context) {
-	service := locator.GetPaymentService()
+func GetUserPayments(c *gin.Context, service service.PaymentService) {
 	payments, err := service.LimitedList(c.Request.Context(), 0, 10)
 	if err != nil {
 		http.ServerError(c, http.Errors{err.Error()})

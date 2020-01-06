@@ -5,21 +5,18 @@ import (
 	"strconv"
 	"time"
 
+	identityEntity "github.com/Sharykhin/go-payments/domain/identity/entity"
 	paymentService "github.com/Sharykhin/go-payments/domain/payment/service"
-
-	"github.com/Sharykhin/go-payments/core/locator"
 	"github.com/Sharykhin/go-payments/domain/payment/value"
 	"github.com/Sharykhin/go-payments/http"
-	"github.com/Sharykhin/go-payments/http/validation"
-	"github.com/shopspring/decimal"
-
-	identityEntity "github.com/Sharykhin/go-payments/domain/identity/entity"
 	pr "github.com/Sharykhin/go-payments/http/request/payment"
+	"github.com/Sharykhin/go-payments/http/validation"
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 )
 
 // CreatePayment is a handler that services creating a new payment transaction endpoint
-func CreatePayment(c *gin.Context) {
+func CreatePayment(c *gin.Context, service paymentService.PaymentService) {
 	userID, err := getRouteParamAsInt64(c, "id")
 	if err != nil {
 		http.BadRequest(c, http.Errors{"route parameter :id is invalid"})
@@ -42,7 +39,6 @@ func CreatePayment(c *gin.Context) {
 		return
 	}
 
-	service := locator.GetPaymentService()
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(15*time.Second))
 	defer cancel()
 

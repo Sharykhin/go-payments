@@ -1,14 +1,12 @@
 package api
 
 import (
-	"github.com/Sharykhin/go-payments/core/locator"
-	"github.com/Sharykhin/go-payments/domain/user/auth"
-	"github.com/Sharykhin/go-payments/domain/user/service"
 	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
+	"github.com/Sharykhin/go-payments/core/locator"
 	handler "github.com/Sharykhin/go-payments/http/api/handler"
 	handlerAuth "github.com/Sharykhin/go-payments/http/api/handler/auth"
 	handlerPayment "github.com/Sharykhin/go-payments/http/api/handler/payment"
@@ -16,7 +14,7 @@ import (
 )
 
 // ListenAndServe starts serving http requests
-func ListenAndServe() error {
+func ListenAndServe(sl *locator.ServiceLocator) error {
 	r := gin.New()
 
 	r.Use(cors.Default())
@@ -27,26 +25,30 @@ func ListenAndServe() error {
 		v1.POST("/register", func(c *gin.Context) {
 			handlerAuth.Register(
 				c,
-				service.NewUserService(),
-				locator.GetQueueService(),
+				sl.GetUserService(),
+				sl.GetPublisherService(),
 			)
 		})
 		v1.POST("/login", func(c *gin.Context) {
-
-			handlerAuth.Login(c, auth.NewUserAuth(
-				service.NewAppUserRetriever(),
-				locator.GetIdentityService(),
-				locator.GetTokenService(),
-				locator.GetQueueService(),
-			))
+			handlerAuth.Login(c, sl.GetAuthService())
 		})
 	}
 
 	auth := v1.Group("/")
 	{
 		auth.Use(middleware.AuthByToken())
-		auth.GET("/users/:id/payments", handlerPayment.GetUserPayments)
-		auth.POST("/users/:id/payments", handlerPayment.CreatePayment)
+		auth.GET("/users/:id/payments", func(c *gin.Context) {
+			handlerPayment.GetUserPayments(
+				c,
+				sl.GetPaymentService(),
+			)
+		})
+		auth.POST("/users/:id/payments", func(c *gin.Context) {
+			handlerPayment.CreatePayment(
+				c,
+				sl.GetPaymentService(),
+			)
+		})
 	}
 
 	return r.Run(os.Getenv("API_ADDR"))

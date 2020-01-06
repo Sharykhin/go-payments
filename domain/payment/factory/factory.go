@@ -1,8 +1,8 @@
 package factory
 
 import (
-	"github.com/Sharykhin/go-payments/core/file/local"
-	"github.com/Sharykhin/go-payments/core/queue/rabbitmq"
+	"github.com/Sharykhin/go-payments/core/file"
+	"github.com/Sharykhin/go-payments/core/queue"
 	"github.com/Sharykhin/go-payments/core/type"
 	"github.com/Sharykhin/go-payments/domain/payment/model"
 	"github.com/Sharykhin/go-payments/domain/payment/value"
@@ -20,11 +20,16 @@ type (
 	}
 
 	paymentFactory struct {
+		fileUploader file.Uploader
+		dispatcher   queue.Publisher
 	}
 )
 
-func NewPaymentFactory() PaymentFactory {
-	return &paymentFactory{}
+func NewPaymentFactory(fileUploader file.Uploader, dispatcher queue.Publisher) PaymentFactory {
+	return &paymentFactory{
+		fileUploader: fileUploader,
+		dispatcher:   dispatcher,
+	}
 }
 
 func (f paymentFactory) NewPayment(
@@ -34,13 +39,16 @@ func (f paymentFactory) NewPayment(
 	createdAt types.Time,
 	user model.UserInterface,
 ) *model.Payment {
-	return model.NewPayment(
+
+	payment := model.NewPayment(
 		id,
 		amount,
 		description,
 		createdAt,
 		user,
-		local.NewUploader(),
-		rabbitmq.NewQueue(),
+		f.fileUploader,
+		f.dispatcher,
 	)
+
+	return payment
 }
