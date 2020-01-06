@@ -26,7 +26,7 @@ type (
 func NewAppUserCommander() *AppUserCommander {
 	return &AppUserCommander{
 		userRepository:      repository.NewGORMRepository(),
-		userIdentityService: identity.NewUserIdentityService(),
+		userIdentityService: identity.NewIdentityService(),
 		dispatcher:          queue.Default(),
 	}
 }

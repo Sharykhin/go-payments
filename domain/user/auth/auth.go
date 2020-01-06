@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -10,22 +11,21 @@ import (
 	"github.com/Sharykhin/go-payments/core/event"
 	"github.com/Sharykhin/go-payments/core/logger"
 	"github.com/Sharykhin/go-payments/core/queue"
-	identityApplicationEntity "github.com/Sharykhin/go-payments/domain/identity/application/entity"
 	"github.com/Sharykhin/go-payments/domain/identity/service/identity"
 	"github.com/Sharykhin/go-payments/domain/identity/service/token"
-	"github.com/Sharykhin/go-payments/domain/user/application/request"
 	userModel "github.com/Sharykhin/go-payments/domain/user/model"
 	"github.com/Sharykhin/go-payments/domain/user/service"
 )
 
 type (
+	Token string
 	// UserAuth provides API for authentication and authorization purposes
 	UserAuth interface {
-		SingIn(ctx context.Context, req request.UserSignInRequest) (*userModel.User, identityApplicationEntity.Token, error)
+		SingIn(ctx context.Context, req UserSignInRequest) (*userModel.User, Token, error)
 	}
 
 	// AppUserAuth is a concrete implementation of UserAuth interface
-	AppUserAuth struct {
+	userAuth struct {
 		userRetriever service.UserRetriever
 		userIdentity  identity.UserIdentity
 		token         token.Tokener
@@ -44,7 +44,7 @@ func NewUserAuth(
 	tokener token.Tokener,
 	dispatcher queue.Publisher,
 ) UserAuth {
-	return &AppUserAuth{
+	return &userAuth{
 		userRetriever: userRetriever,
 		userIdentity:  userIdentitier,
 		token:         tokener,
@@ -52,23 +52,39 @@ func NewUserAuth(
 	}
 }
 
+func (req UserSignInRequest) Validate() error {
+	if req.Email == "" {
+		return errors.New("email field is required")
+	}
+
+	if req.Password == "" {
+		return errors.New("password field is required")
+	}
+
+	return nil
+}
+
 // SingIn signs user in by using general credentials such as email and password
 // It also generate JWT token.
 //TODO: just return JWT token it would be more semantic and obvious
-func (s AppUserAuth) SingIn(
+func (s userAuth) SingIn(
 	ctx context.Context,
-	req request.UserSignInRequest,
+	req UserSignInRequest,
 ) (
 	*userModel.User,
-	identityApplicationEntity.Token,
+	Token,
 	error,
 ) {
+	if err := req.Validate(); err != nil {
+		return nil, "", err
+	}
+
 	user, err := s.userRetriever.FindUserByEmail(ctx, req.Email)
 	if err != nil {
 		// TODO: replace by NotFoundError
 		return nil, "", fmt.Errorf("failed to find user by email: %v", err)
 	}
-	// TODO: replace by IncorrectPasssword or to use errors.Is add create new error method
+	// TODO: replace by IncorrectPassword or to use errors.Is add create new error method
 	if isValid, err := s.userIdentity.ValidatePassword(ctx, user.GetIdentity().Password, req.Password); !isValid {
 		return nil, "", fmt.Errorf("failed to validate password: %v", err)
 	}
@@ -82,10 +98,10 @@ func (s AppUserAuth) SingIn(
 
 	s.raiseSuccessSignInEvent(user.GetID())
 
-	return user, identityApplicationEntity.Token(tokenStr), nil
+	return user, Token(tokenStr), nil
 }
 
-func (s AppUserAuth) raiseSuccessSignInEvent(userID int64) {
+func (s userAuth) raiseSuccessSignInEvent(userID int64) {
 	err := s.dispatcher.RaiseEvent(event.NewEvent(event.UserSignIn, event.Payload{
 		"UserID":  userID,
 		"LoginAt": time.Now().UTC().Format(core.ISO8601),

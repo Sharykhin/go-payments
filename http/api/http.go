@@ -30,7 +30,7 @@ func ListenAndServe(sl *locator.ServiceLocator) error {
 			)
 		})
 		v1.POST("/login", func(c *gin.Context) {
-			handlerAuth.Login(c, sl.GetAuthService())
+			handlerAuth.Login(c, sl.GetAuthService(), sl.GetLoggerService())
 		})
 	}
 
