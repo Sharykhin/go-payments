@@ -9,19 +9,16 @@ import (
 	"time"
 
 	"github.com/Sharykhin/go-payments/core"
-
-	"github.com/Sharykhin/go-payments/core/logger"
-
-	"github.com/Sharykhin/go-payments/core/locator"
-
 	"github.com/Sharykhin/go-payments/core/event"
-	"github.com/Sharykhin/go-payments/core/queue"
+	"github.com/Sharykhin/go-payments/core/locator"
+	"github.com/Sharykhin/go-payments/core/logger"
 )
 
 func main() {
-	q := queue.New(queue.DefaultQueue)
+	sl := locator.NewServiceLocator()
+	subscriber := sl.GetSubscriberService()
 
-	err := q.Subscribe("notification", event.UserRegisteredEvent, func(e event.Event) {
+	err := subscriber.Subscribe("notification", event.UserRegisteredEvent, func(e event.Event) {
 		fmt.Println("User Registered", e)
 	})
 
@@ -29,16 +26,16 @@ func main() {
 		log.Fatalf("faield to subscribe on event: %v", err)
 	}
 
-	err = q.Subscribe("notification", event.UserSignIn, func(e event.Event) {
+	err = subscriber.Subscribe("notification", event.UserSignIn, func(e event.Event) {
 		log.Println("Goi event UserSingIn", e.Data, e.Time)
 
-		service := locator.GetIdentityService()
-		ctx, done := context.WithTimeout(context.Background(), time.Duration(1*time.Minute))
-		defer done()
+		identityService := sl.GetIdentityService()
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(1*time.Minute))
+		defer cancel()
 		t, _ := time.Parse(core.ISO8601, e.Data["LoginAt"].(string))
 
 		log.Printf("HA: %T %v %T %v", e.Data["UserID"], e.Data["UserID"], e.Data["LoginAt"], e.Data["LoginAt"])
-		err := service.UpdateLastLogin(ctx, int64(e.Data["UserID"].(float64)), t)
+		err := identityService.UpdateLastLogin(ctx, int64(e.Data["UserID"].(float64)), t)
 		if err != nil {
 			logger.Error("could not update users's last login: %v", err)
 		}
