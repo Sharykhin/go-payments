@@ -7,29 +7,27 @@ import (
 	"time"
 
 	"github.com/Sharykhin/go-payments/core"
-
 	"github.com/Sharykhin/go-payments/core/event"
 	"github.com/Sharykhin/go-payments/core/logger"
 	"github.com/Sharykhin/go-payments/core/queue"
+	"github.com/Sharykhin/go-payments/domain/identity/jwt"
 	"github.com/Sharykhin/go-payments/domain/identity/service/identity"
-	"github.com/Sharykhin/go-payments/domain/identity/service/token"
 	userModel "github.com/Sharykhin/go-payments/domain/user/model"
 	"github.com/Sharykhin/go-payments/domain/user/service"
 )
 
 type (
-	Token string
 	// UserAuth provides API for authentication and authorization purposes
 	UserAuth interface {
-		SingIn(ctx context.Context, req UserSignInRequest) (*userModel.User, Token, error)
+		SingIn(ctx context.Context, req UserSignInRequest) (*userModel.User, jwt.Token, error)
 	}
 
 	// AppUserAuth is a concrete implementation of UserAuth interface
 	userAuth struct {
-		userRetriever service.UserRetriever
-		userIdentity  identity.UserIdentity
-		token         token.Tokener
-		dispatcher    queue.Publisher
+		userRetriever  service.UserRetriever
+		userIdentifier identity.UserIdentity
+		tokenManager   jwt.TokenManager
+		dispatcher     queue.Publisher
 	}
 
 	UserSignInRequest struct {
@@ -40,15 +38,15 @@ type (
 
 func NewUserAuth(
 	userRetriever service.UserRetriever,
-	userIdentitier identity.UserIdentity,
-	tokener token.Tokener,
+	userIdentifier identity.UserIdentity,
+	tokenManager jwt.TokenManager,
 	dispatcher queue.Publisher,
 ) UserAuth {
 	return &userAuth{
-		userRetriever: userRetriever,
-		userIdentity:  userIdentitier,
-		token:         tokener,
-		dispatcher:    dispatcher,
+		userRetriever:  userRetriever,
+		userIdentifier: userIdentifier,
+		tokenManager:   tokenManager,
+		dispatcher:     dispatcher,
 	}
 }
 
@@ -72,7 +70,7 @@ func (s userAuth) SingIn(
 	req UserSignInRequest,
 ) (
 	*userModel.User,
-	Token,
+	jwt.Token,
 	error,
 ) {
 	if err := req.Validate(); err != nil {
@@ -85,20 +83,20 @@ func (s userAuth) SingIn(
 		return nil, "", fmt.Errorf("failed to find user by email: %v", err)
 	}
 	// TODO: replace by IncorrectPassword or to use errors.Is add create new error method
-	if isValid, err := s.userIdentity.ValidatePassword(ctx, user.GetIdentity().Password, req.Password); !isValid {
+	if isValid, err := s.userIdentifier.ValidatePassword(ctx, user.GetIdentity().Password, req.Password); !isValid {
 		return nil, "", fmt.Errorf("failed to validate password: %v", err)
 	}
 
-	tokenStr, err := s.token.Generate(map[string]interface{}{
+	tokenStr, err := s.tokenManager.Generate(jwt.Claims(map[string]interface{}{
 		"userID": user.GetID(),
-	}, time.Duration(1*time.Hour))
+	}), time.Duration(1*time.Hour))
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to generate token: %v", err)
 	}
 
 	s.raiseSuccessSignInEvent(user.GetID())
 
-	return user, Token(tokenStr), nil
+	return user, jwt.Token(tokenStr), nil
 }
 
 func (s userAuth) raiseSuccessSignInEvent(userID int64) {

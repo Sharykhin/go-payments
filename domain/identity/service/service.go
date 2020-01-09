@@ -18,12 +18,4 @@ type (
 
 	//TODO:
 	// I have concerns regarding UpdateLastLogin method
-
-	// Tokener is a general interface that provides method for working
-	// with identification through the token string. Providers can be different, like
-	// JWT, OAuth etc.
-	Tokener interface {
-		Generate(ctx context.Context, claims map[string]interface{}, expiration time.Duration) (string, error)
-		Validate(ctx context.Context, token string) (map[string]interface{}, error)
-	}
 )

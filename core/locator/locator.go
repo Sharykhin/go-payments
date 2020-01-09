@@ -1,22 +1,23 @@
 package locator
 
 import (
+	"sync"
+
 	"github.com/Sharykhin/go-payments/core/database/gorm"
 	"github.com/Sharykhin/go-payments/core/file"
 	"github.com/Sharykhin/go-payments/core/file/local"
 	"github.com/Sharykhin/go-payments/core/logger"
 	"github.com/Sharykhin/go-payments/core/queue"
 	"github.com/Sharykhin/go-payments/core/queue/rabbitmq"
+	"github.com/Sharykhin/go-payments/domain/identity/jwt"
 	identityRepository "github.com/Sharykhin/go-payments/domain/identity/repository"
 	identityService "github.com/Sharykhin/go-payments/domain/identity/service/identity"
-	"github.com/Sharykhin/go-payments/domain/identity/service/token"
 	paymentFactory "github.com/Sharykhin/go-payments/domain/payment/factory"
 	"github.com/Sharykhin/go-payments/domain/payment/repository"
 	paymentService "github.com/Sharykhin/go-payments/domain/payment/service"
 	"github.com/Sharykhin/go-payments/domain/user/auth"
 	userService "github.com/Sharykhin/go-payments/domain/user/service"
-	gorm2 "github.com/jinzhu/gorm"
-	"sync"
+	gormORM "github.com/jinzhu/gorm"
 )
 
 type (
@@ -25,7 +26,7 @@ type (
 		initialized bool
 		queue       queue.QueueManager
 		log         logger.Logger
-		db          *gorm2.DB
+		db          *gormORM.DB
 	}
 )
 
@@ -97,13 +98,13 @@ func (s *ServiceLocator) GetUserService() userService.UserService {
 	return s.instances["UserService"].(userService.UserService)
 }
 
-func (s *ServiceLocator) GetTokenService() token.Tokener {
+func (s *ServiceLocator) GetJWTService() jwt.TokenManager {
 	var once sync.Once
 	once.Do(func() {
-		s.instances["TokenService"] = token.NewTokenService(token.TypeJWF)
+		s.instances["JWTService"] = jwt.NewTokenManager(jwt.SH256)
 	})
 
-	return s.instances["TokenService"].(token.Tokener)
+	return s.instances["JWTService"].(jwt.TokenManager)
 }
 
 func (s *ServiceLocator) GetUploaderService() file.Uploader {
@@ -155,7 +156,7 @@ func (s *ServiceLocator) GetAuthService() auth.UserAuth {
 		s.instances["AuthService"] = auth.NewUserAuth(
 			s.GetUserService(),
 			s.GetIdentityService(),
-			s.GetTokenService(),
+			s.GetJWTService(),
 			s.GetPublisherService(),
 		)
 	})

@@ -7,7 +7,6 @@ import (
 	"github.com/jinzhu/gorm"
 
 	types "github.com/Sharykhin/go-payments/core/type"
-	"github.com/Sharykhin/go-payments/domain/identity/repository/entity"
 )
 
 type (
@@ -19,8 +18,8 @@ type (
 )
 
 // Create creates a new user in a database and returns just created record
-func (r GORMRepository) CreatePassword(cxt context.Context, userID int64, password string) (*entity.UserPassword, error) {
-	up := entity.UserPassword{
+func (r GORMRepository) CreatePassword(cxt context.Context, userID int64, password string) (*UserPassword, error) {
+	up := UserPassword{
 		UserID:   userID,
 		Password: password,
 	}
@@ -32,9 +31,9 @@ func (r GORMRepository) CreatePassword(cxt context.Context, userID int64, passwo
 	return &up, nil
 }
 
-func (r GORMRepository) FindPasswordByUserID(cxt context.Context, userID int64) ([]entity.UserPassword, error) {
-	var up []entity.UserPassword
-	err := r.conn.Where(entity.UserPassword{UserID: userID}).Order("created_at desc").Find(&up).Error
+func (r GORMRepository) FindPasswordByUserID(cxt context.Context, userID int64) ([]UserPassword, error) {
+	var up []UserPassword
+	err := r.conn.Where(UserPassword{UserID: userID}).Order("created_at desc").Find(&up).Error
 	if err != nil {
 		return nil, fmt.Errorf("could execute find password by user id: %v", err)
 	}
@@ -45,7 +44,7 @@ func (r GORMRepository) FindPasswordByUserID(cxt context.Context, userID int64) 
 // Update is a general update methods that can update specified number of field abstracting
 // any knowledge of data source and its schema
 func (r GORMRepository) Update(ctx context.Context, userID int64, fields UpdateFields) error {
-	user := entity.User{
+	user := User{
 		ID: userID,
 	}
 	r.conn.First(&user)

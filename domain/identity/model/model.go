@@ -1,4 +1,4 @@
-package entity
+package model
 
 // Role represents role as integer
 // so we can use mask to check more difficult permissions

@@ -8,7 +8,7 @@ import (
 func TestJWT_Generate(t *testing.T) {
 	claims := make(map[string]interface{})
 	exp := 1 * time.Second
-	token := NewJWT()
+	token := NewTokenManager(RS256)
 
 	tokenString, err := token.Generate(claims, exp)
 	if err != nil {
@@ -24,7 +24,7 @@ func TestJWT_Validate(t *testing.T) {
 		"name": "name",
 	}
 	exp := 1 * time.Minute
-	token := NewJWT()
+	token := NewTokenManager(RS256)
 	tokenString, err := token.Generate(claims, exp)
 	if err != nil {
 		t.Errorf("unexpected error on token generate: %v", err)
