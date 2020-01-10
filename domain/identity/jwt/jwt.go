@@ -31,14 +31,14 @@ type (
 	// Token is an alias of string to make the token itself more semantic
 	Token string
 	// jwt is a struct that can generate and validate JWT tokens
-	jwt struct {
+	JWT struct {
 		algorithm Algorithm
 		secret    []byte
 	}
 )
 
 // Generate generates a new jwt token with a provided data and expiration
-func (j jwt) Generate(claims Claims, expiration time.Duration) (Token, error) {
+func (j JWT) Generate(claims Claims, expiration time.Duration) (Token, error) {
 	jwtClaims := jwtGo.MapClaims(claims)
 	jwtClaims["exp"] = time.Now().UTC().Add(expiration).Unix()
 
@@ -52,7 +52,7 @@ func (j jwt) Generate(claims Claims, expiration time.Duration) (Token, error) {
 }
 
 // Validate validates token and if it is valid returns its claims
-func (j jwt) Validate(tokenStr Token) (Claims, error) {
+func (j JWT) Validate(tokenStr Token) (Claims, error) {
 	token, err := jwtGo.Parse(string(tokenStr), func(token *jwtGo.Token) (i interface{}, e error) {
 		if _, ok := token.Method.(*jwtGo.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -79,7 +79,22 @@ func (j jwt) Validate(tokenStr Token) (Claims, error) {
 // NewTokenManager returns a concrete jwt implementation based on secret
 // that satisfies an interface
 func NewTokenManager(algorithm Algorithm) TokenManager {
-	tm := jwt{
+	tm := JWT{
+		algorithm: algorithm,
+	}
+
+	switch algorithm {
+	case SH256:
+		tm.secret = []byte(os.Getenv("JWT_SECRET"))
+	case RS256:
+		// Implement rs256
+	}
+
+	return &tm
+}
+
+func NewJWT(algorithm Algorithm) *JWT {
+	tm := JWT{
 		algorithm: algorithm,
 	}
 

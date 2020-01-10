@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Sharykhin/go-payments/domain/identity/hash"
+
 	"github.com/Sharykhin/go-payments/core/event"
 	"github.com/Sharykhin/go-payments/core/logger"
 	"github.com/Sharykhin/go-payments/core/queue"
 	types "github.com/Sharykhin/go-payments/core/type"
 	"github.com/Sharykhin/go-payments/domain/identity/repository"
-	"github.com/Sharykhin/go-payments/domain/identity/service/password"
 )
 
 type (
@@ -19,6 +20,7 @@ type (
 		repository repository.IdentityRepository
 		logger     logger.Logger
 		dispatcher queue.Publisher
+		hasher     hash.Hasher
 	}
 )
 
@@ -29,23 +31,25 @@ func NewIdentityService(
 	repository repository.IdentityRepository,
 	logger logger.Logger,
 	dispatcher queue.Publisher,
+	hasher hash.Hasher,
 ) *UserIdentity {
 
 	return &UserIdentity{
 		repository: repository,
 		logger:     logger,
 		dispatcher: dispatcher,
+		hasher:     hasher,
 	}
 }
 
 // CreatePassword creates a new password for a given user ID. it applies a corresponding hash function
 // and raises an event that a user password has been created.
 func (a UserIdentity) CreatePassword(ctx context.Context, userID int64, pass string) (string, error) {
-	hash, err := password.GeneratePassword(pass)
+	h, err := a.hasher.GenerateHash(pass)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate a hash based on a user password: %v", err)
 	}
-	up, err := a.repository.CreatePassword(ctx, userID, hash)
+	up, err := a.repository.CreatePassword(ctx, userID, string(h))
 	if err != nil {
 		return "", fmt.Errorf("failed to create a new user password: %v", err)
 	}
@@ -71,11 +75,9 @@ func (a UserIdentity) FindUserPassword(ctx context.Context, userID int64) (strin
 
 // ValidatePassword just validates whether a plaint text password is equal to its hashed one
 func (a UserIdentity) ValidatePassword(ctx context.Context, pass string, compare string) (bool, error) {
-	if err := password.ComparePasswords(compare, pass); err != nil {
-		return false, err
-	}
+	valid, err := a.hasher.ValidateHash(compare, hash.Hash(pass))
 
-	return true, nil
+	return valid, err
 }
 
 // UpdateLastLogin updates user's last login

@@ -6,10 +6,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/Sharykhin/go-payments/core/deferrer"
-
 	"github.com/streadway/amqp"
 
+	"github.com/Sharykhin/go-payments/core/deferrer"
 	"github.com/Sharykhin/go-payments/core/event"
 )
 
